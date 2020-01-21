@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Movie Database</string>
+    <string name="unlock_all_that_mdb_has_to_offer">Unlock all that MDb has to offer</string>
+    <string name="login">Login</string>
+    <string name="create_an_account">Create an account</string>
+    <string name="or">or</string>
+    <string name="later">Later</string>
+    <string name="exit">Exit</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="refresh">refresh</string>
+    <string name="home">Home</string>
+    <string name="favorites_movies">Favorites Movies</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="account">Account</string>
+    <string name="search_movies">Search movies</string>
+</resources>
