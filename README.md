@@ -4,7 +4,11 @@ Movie Database is Android app made using MVVM and Repository patterns, it's usin
 and for saving user content.
 
 Dependencies used:
+
 https://square.github.io/picasso/
+
 https://square.github.io/okhttp/
+
 https://github.com/json-path/JsonPath
+
 
