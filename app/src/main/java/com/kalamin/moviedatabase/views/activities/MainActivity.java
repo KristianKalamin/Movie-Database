@@ -1,6 +1,8 @@
 package com.kalamin.moviedatabase.views.activities;
 
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,11 +11,10 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.kalamin.moviedatabase.R;
-import com.kalamin.moviedatabase.utils.InternetConnection;
+import com.kalamin.moviedatabase.listener.InternetConnectionReceiver;
 import com.kalamin.moviedatabase.viewmodels.MainViewModel;
 import com.kalamin.moviedatabase.views.fragments.EnterAppFragment;
 import com.kalamin.moviedatabase.views.fragments.NavigationHost;
-import com.kalamin.moviedatabase.views.fragments.NoInternetFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationHost {
 
@@ -23,17 +24,22 @@ public class MainActivity extends AppCompatActivity implements NavigationHost {
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
-            if (!InternetConnection.checkConnection(this)) {
-                navigateTo(NoInternetFragment.newInstance(), false);
-            } else {
-                MainViewModel mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-                if (!mainViewModel.isUserSignedIn())
-                    navigateTo(EnterAppFragment.newInstance(), false);
-                else {
-                    this.finish();
-                    startActivity(new Intent(this, HomeActivity.class));
+            InternetConnectionReceiver internetConnectionReceiver = new InternetConnectionReceiver();
+            this.registerReceiver(internetConnectionReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+            internetConnectionReceiver.setInternetConnectionListener(isConnected -> {
+                if (!isConnected) {
+                    startActivity(new Intent(this, NoInternetActivity.class));
+                } else {
+                    MainViewModel mainViewModel = ViewModelProviders.of(MainActivity.this).get(MainViewModel.class);
+                    if (!mainViewModel.isUserSignedIn())
+                        navigateTo(EnterAppFragment.newInstance(), false);
+                    else {
+                        MainActivity.this.finish();
+                        startActivity(new Intent(MainActivity.this, HomeActivity.class));
+                    }
                 }
-            }
+            });
         }
     }
 
@@ -48,6 +54,6 @@ public class MainActivity extends AppCompatActivity implements NavigationHost {
             transaction.addToBackStack(null);
         }
 
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
     }
 }

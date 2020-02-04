@@ -2,6 +2,8 @@ package com.kalamin.moviedatabase.views.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +15,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.kalamin.moviedatabase.R;
+import com.kalamin.moviedatabase.listener.InternetConnectionReceiver;
 import com.kalamin.moviedatabase.model.entity.MovieDetails;
 import com.kalamin.moviedatabase.viewmodels.MovieDetailsViewModel;
 import com.squareup.picasso.Picasso;
@@ -38,6 +41,17 @@ public class MovieDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
+
+        if (savedInstanceState == null) {
+            InternetConnectionReceiver internetConnectionReceiver = new InternetConnectionReceiver();
+            this.registerReceiver(internetConnectionReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+            internetConnectionReceiver.setInternetConnectionListener(isConnected -> {
+                if (!isConnected) {
+                    startActivity(new Intent(MovieDetailActivity.this, NoInternetActivity.class));
+                }
+            });
+        }
 
         txtTitle = findViewById(R.id.txtTitle);
         txtRuntime = findViewById(R.id.txtRuntime);

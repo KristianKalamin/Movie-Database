@@ -70,6 +70,7 @@ public class SearchAdapter implements ListAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
        Movie movie = movies.get(position);
+
        if (convertView == null) {
            LayoutInflater layoutInflater = LayoutInflater.from(context);
            convertView = layoutInflater.inflate(R.layout.list_row, parent, false);

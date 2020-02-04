@@ -2,6 +2,9 @@ package com.kalamin.moviedatabase.views.activities;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +23,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.navigation.NavigationView;
 import com.kalamin.moviedatabase.R;
+import com.kalamin.moviedatabase.listener.InternetConnectionReceiver;
 import com.kalamin.moviedatabase.viewmodels.HomeViewModel;
 import com.kalamin.moviedatabase.views.fragments.AccountFragment;
 import com.kalamin.moviedatabase.views.fragments.EnterAppFragment;
@@ -32,10 +36,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawer;
     private HomeViewModel homeViewModel;
 
+    private InternetConnectionReceiver internetConnectionReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -51,9 +58,18 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
 
         if (savedInstanceState == null) {
-            navigateTo(HomeFragment.newInstance(), false);
-            navigationView.setCheckedItem(R.id.nav_home);
+            internetConnectionReceiver = new InternetConnectionReceiver();
+            this.registerReceiver(internetConnectionReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         }
+
+        this.internetConnectionReceiver.setInternetConnectionListener(isConnected -> {
+            if (!isConnected) {
+                startActivity(new Intent(HomeActivity.this, NoInternetActivity.class));
+            } else {
+                navigateTo(HomeFragment.newInstance(), false);
+                navigationView.setCheckedItem(R.id.nav_home);
+            }
+        });
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -112,6 +128,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             transaction.addToBackStack(null);
         }
 
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
     }
 }
