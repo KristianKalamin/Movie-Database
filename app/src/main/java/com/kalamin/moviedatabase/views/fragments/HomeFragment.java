@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 public class HomeFragment extends Fragment {
     private static final int SHOW_MOVIE_DETAILS = 1;
     private HomeViewModel homeViewModel;
+    private MoviesCardRecyclerViewAdapter adapter;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -50,10 +51,10 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerView.setHasFixedSize(true);
 
-        final MoviesCardRecyclerViewAdapter adapter = new MoviesCardRecyclerViewAdapter("movie");
+        adapter = new MoviesCardRecyclerViewAdapter("movie");
         recyclerView.setAdapter(adapter);
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
-        homeViewModel.getDiscoveredMovies().observe(this, adapter::setMovies);
+        //homeViewModel.getDiscoveredMovies().observe(this, adapter::setMovies);
 
         adapter.setOnItemClickListener(movie -> {
             Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
@@ -61,5 +62,18 @@ public class HomeFragment extends Fragment {
 
             startActivityForResult(intent, SHOW_MOVIE_DETAILS);
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        homeViewModel.getDiscoveredMovies().observeForever(adapter::setMovies);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        homeViewModel.getDiscoveredMovies().removeObservers(this);
     }
 }

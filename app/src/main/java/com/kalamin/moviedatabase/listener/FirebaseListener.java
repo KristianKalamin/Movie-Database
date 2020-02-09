@@ -20,7 +20,6 @@ public class FirebaseListener {
     private MovieRepository movieRepository;
     private static FirebaseListener firebaseListener = null;
     private MutableLiveData<Map<String, Movie>> favoriteMoviesLiveData;
-    private Map<String, Movie> favoriteMovies;
     private DatabaseReference reference;
     private Context context;
 
@@ -34,7 +33,6 @@ public class FirebaseListener {
         movieRepository = MovieRepository.getInstance(context);
         this.context = context;
         favoriteMoviesLiveData = new MutableLiveData<>();
-        favoriteMovies = new HashMap<>();
     }
 
     public void startFavoriteMoviesListener() {
@@ -56,10 +54,8 @@ public class FirebaseListener {
                 for (Map.Entry<String, String> entry : map.entrySet()) {
                     idMovieMap.put(entry.getKey(), movieRepository.getMovie(entry.getValue()));
                 }
-                favoriteMovies.putAll(idMovieMap);
                 favoriteMoviesLiveData.postValue(idMovieMap);
             } else {
-                favoriteMovies.putAll(new HashMap<String, Movie>());
                 favoriteMoviesLiveData.postValue(new HashMap<String, Movie>());
             }
         }
@@ -76,9 +72,5 @@ public class FirebaseListener {
 
     public MutableLiveData<Map<String, Movie>> getFavoriteMoviesLiveData() {
         return favoriteMoviesLiveData;
-    }
-
-    public Map<String, Movie> getFavoriteMovies() {
-        return favoriteMovies;
     }
 }

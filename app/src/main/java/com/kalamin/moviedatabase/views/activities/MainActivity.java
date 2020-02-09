@@ -17,6 +17,7 @@ import com.kalamin.moviedatabase.views.fragments.EnterAppFragment;
 import com.kalamin.moviedatabase.views.fragments.NavigationHost;
 
 public class MainActivity extends AppCompatActivity implements NavigationHost {
+    private InternetConnectionReceiver internetConnectionReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements NavigationHost {
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
-            InternetConnectionReceiver internetConnectionReceiver = new InternetConnectionReceiver();
+            internetConnectionReceiver = new InternetConnectionReceiver();
             this.registerReceiver(internetConnectionReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
             internetConnectionReceiver.setInternetConnectionListener(isConnected -> {
@@ -55,5 +56,11 @@ public class MainActivity extends AppCompatActivity implements NavigationHost {
         }
 
         transaction.commitAllowingStateLoss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.unregisterReceiver(internetConnectionReceiver);
     }
 }

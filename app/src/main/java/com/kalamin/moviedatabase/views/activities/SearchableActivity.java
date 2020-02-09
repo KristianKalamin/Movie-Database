@@ -29,13 +29,15 @@ public class SearchableActivity extends AppCompatActivity {
     private SearchableViewModel searchableViewModel;
     private ListView listView;
 
+    private InternetConnectionReceiver internetConnectionReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_searchable);
 
         if (savedInstanceState == null) {
-            InternetConnectionReceiver internetConnectionReceiver = new InternetConnectionReceiver();
+            internetConnectionReceiver = new InternetConnectionReceiver();
             this.registerReceiver(internetConnectionReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
             internetConnectionReceiver.setInternetConnectionListener(isConnected -> {
@@ -91,5 +93,11 @@ public class SearchableActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.unregisterReceiver(internetConnectionReceiver);
     }
 }

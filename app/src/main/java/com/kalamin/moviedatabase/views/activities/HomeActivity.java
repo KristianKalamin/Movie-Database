@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -42,7 +43,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -98,21 +98,23 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case R.id.nav_home:
-                navigateTo(HomeFragment.newInstance(), true);
-                break;
-            case R.id.nav_favorites:
-                if (homeViewModel.isUserSignedIn())
-                    navigateTo(FavoriteMoviesFragment.newInstance(), true);
-                else navigateTo(EnterAppFragment.newInstance(), true);
-                break;
-            case R.id.nav_account:
-                if (homeViewModel.isUserSignedIn())
-                    navigateTo(AccountFragment.newInstance(), true);
-                else navigateTo(EnterAppFragment.newInstance(), true);
-                break;
-        }
+        new Handler().postDelayed(() -> {
+            switch (menuItem.getItemId()) {
+                case R.id.nav_home:
+                    navigateTo(HomeFragment.newInstance(), true);
+                    break;
+                case R.id.nav_favorites:
+                    if (homeViewModel.isUserSignedIn())
+                        navigateTo(FavoriteMoviesFragment.newInstance(), true);
+                    else navigateTo(EnterAppFragment.newInstance(), true);
+                    break;
+                case R.id.nav_account:
+                    if (homeViewModel.isUserSignedIn())
+                        navigateTo(AccountFragment.newInstance(), true);
+                    else navigateTo(EnterAppFragment.newInstance(), true);
+                    break;
+            }
+        }, 200);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -129,5 +131,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }
 
         transaction.commitAllowingStateLoss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.unregisterReceiver(internetConnectionReceiver);
     }
 }

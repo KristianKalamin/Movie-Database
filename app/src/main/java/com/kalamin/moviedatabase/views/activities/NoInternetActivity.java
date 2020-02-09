@@ -10,6 +10,7 @@ import com.kalamin.moviedatabase.R;
 import com.kalamin.moviedatabase.listener.InternetConnectionReceiver;
 
 public class NoInternetActivity extends AppCompatActivity {
+    private InternetConnectionReceiver internetConnectionReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,7 +18,7 @@ public class NoInternetActivity extends AppCompatActivity {
         setContentView(R.layout.activity_no_internet);
 
         if (savedInstanceState == null) {
-            InternetConnectionReceiver internetConnectionReceiver = new InternetConnectionReceiver();
+            internetConnectionReceiver = new InternetConnectionReceiver();
             this.registerReceiver(internetConnectionReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
             internetConnectionReceiver.setInternetConnectionListener(isConnected -> {
@@ -30,6 +31,12 @@ public class NoInternetActivity extends AppCompatActivity {
         findViewById(R.id.btnExit).setOnClickListener(v ->
                 this.finish());
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.unregisterReceiver(internetConnectionReceiver);
     }
 
     @Override

@@ -58,16 +58,16 @@ public class FirebaseRepository {
         firebaseListener.stopFavoriteMoviesListener();
     }
 
-   public void addFavoriteMovie(@NotNull String movieDetailsId) {
+    public void addFavoriteMovie(@NotNull String movieDetailsId) {
         firebaseDB.addFavoriteMovie(movieDetailsId, currentUser.getFirebaseUser().getUid());
     }
 
     public void removeFavoriteMovie(@NotNull Movie movie) {
-       firebaseDB.removeFavoriteMovie(movie, firebaseListener.getFavoriteMovies(), currentUser.getFirebaseUser().getUid());
+        firebaseDB.removeFavoriteMovie(movie, firebaseListener.getFavoriteMoviesLiveData().getValue(), currentUser.getFirebaseUser().getUid());
     }
 
-    public void removeFavoriteMovie(int id) {
-        firebaseDB.removeFavoriteMovie(id, firebaseListener.getFavoriteMovies(), currentUser.getFirebaseUser().getUid());
+    public void removeFavoriteMovie(String key) {
+        firebaseDB.removeFavoriteMovie(key, currentUser.getFirebaseUser().getUid());
     }
 
     public User getUser() {

@@ -2,9 +2,11 @@ package com.kalamin.moviedatabase.views.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,6 +31,10 @@ import java.util.ArrayList;
 public class FavoriteMoviesFragment extends Fragment {
     private static final int SHOW_MOVIE_DETAILS = 1;
     private FavoriteMoviesViewModel favoriteMoviesViewModel;
+    private TextView msg;
+    private RecyclerView recyclerView;
+    private MoviesCardRecyclerViewAdapter adapter;
+    private ProgressBar progressBar;
 
     public FavoriteMoviesFragment() {
     }
@@ -47,21 +53,39 @@ public class FavoriteMoviesFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView = view.findViewById(R.id.recycler_view);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setHasFixedSize(true);
 
-        TextView msg = view.findViewById(R.id.favorites_msg);
+        msg = view.findViewById(R.id.favorites_msg);
 
-        final MoviesCardRecyclerViewAdapter adapter = new MoviesCardRecyclerViewAdapter("favorite_movie");
+        adapter = new MoviesCardRecyclerViewAdapter("favorite_movie");
         recyclerView.setAdapter(adapter);
+        progressBar = view.findViewById(R.id.favorite_movies_progress_bar);
+
+        adapter.setOnItemClickListener(movie -> {
+            Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+            intent.putExtra(Extra.MOVIE_ID, movie.getId());
+
+            startActivityForResult(intent, SHOW_MOVIE_DETAILS);
+        });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
         favoriteMoviesViewModel = ViewModelProviders.of(this).get(FavoriteMoviesViewModel.class);
-        favoriteMoviesViewModel.getFavoriteMovies().observe(getViewLifecycleOwner(), stringMovieMap -> {
-            if (stringMovieMap.size() != 0)
+        favoriteMoviesViewModel.getFavoriteMovies().observeForever(stringMovieMap -> {
+            progressBar.setVisibility(View.GONE);
+            if (stringMovieMap.size() == 0)
+                msg.setVisibility(View.VISIBLE);
+            else {
                 msg.setVisibility(View.GONE);
-            else msg.setVisibility(View.VISIBLE);
-            adapter.setMovies(new ArrayList<>(stringMovieMap.values()));
+                recyclerView.setVisibility(View.VISIBLE);
+                adapter.setMovies(new ArrayList<>(stringMovieMap.values()));
+            }
         });
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -76,11 +100,11 @@ public class FavoriteMoviesFragment extends Fragment {
             }
         }).attachToRecyclerView(recyclerView);
 
-        adapter.setOnItemClickListener(movie -> {
-            Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
-            intent.putExtra(Extra.MOVIE_ID, movie.getId());
+    }
 
-            startActivityForResult(intent, SHOW_MOVIE_DETAILS);
-        });
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        favoriteMoviesViewModel.getFavoriteMovies().removeObservers(this);
     }
 }

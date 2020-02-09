@@ -1,12 +1,12 @@
 package com.kalamin.moviedatabase.viewmodels;
 
 import android.app.Application;
-import android.os.AsyncTask;
+import android.os.Handler;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.kalamin.moviedatabase.listener.FirebaseListener;
 import com.kalamin.moviedatabase.model.entity.Movie;
@@ -14,61 +14,80 @@ import com.kalamin.moviedatabase.model.entity.MovieDetails;
 import com.kalamin.moviedatabase.repository.FirebaseRepository;
 import com.kalamin.moviedatabase.repository.MovieRepository;
 
-import java.util.Collection;
-import java.util.concurrent.ExecutionException;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
 
 public class MovieDetailsViewModel extends AndroidViewModel {
     private MovieRepository movieRepository;
     private FirebaseListener firebaseListener;
     private FirebaseRepository firebaseRepository;
-    private MutableLiveData<Boolean> savedBtnString = new MutableLiveData<>();
+    private MutableLiveData<Boolean> savedBtnString = new MutableLiveData<>(false);
+    private MutableLiveData<MovieDetails> movie = new MutableLiveData<>();
+    private Handler handler;
+    private String currentMovieKey;
+    private int currentMovieId;
 
     public MovieDetailsViewModel(@NonNull Application application) {
         super(application);
         movieRepository = MovieRepository.getInstance(getApplication().getApplicationContext());
         firebaseRepository = FirebaseRepository.getInstance(getApplication().getApplicationContext());
         firebaseListener = FirebaseListener.getInstance(getApplication().getApplicationContext());
+        handler = new Handler(application.getMainLooper());
     }
 
-    public LiveData<MovieDetails> getMovie(int id) {
-        return movieRepository.getMovieDetails(id);
+    public void askForMovie(int id) {
+        currentMovieId = id;
+        handler.post(() -> movie.postValue(movieRepository.getMovieDetails(id)));
     }
 
-    public void addToFavorite(String movieDetailsId) {
-        firebaseRepository.addFavoriteMovie(movieDetailsId);
+    public MutableLiveData<MovieDetails> getMovieObservable() {
+        return movie;
     }
 
-    public MutableLiveData<Boolean> isMovieFavorite(int id) {
-        try {
-            boolean b = new AsyncCheck().execute(id).get();
-            savedBtnString.postValue(b);
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
+    public MutableLiveData<Boolean> getSavedBtnStringObservable() {
         return savedBtnString;
     }
+
+    public void addToFavorite() {
+        handler.post(() -> firebaseRepository.addFavoriteMovie(String.valueOf(currentMovieId)));
+    }
+
+    public void isMovieFavorite() {
+        this.firebaseListener.getFavoriteMoviesLiveData().observeForever(mapObserver);
+    }
+
+    private Observer<Map<String, Movie>> mapObserver = new Observer<Map<String, Movie>>() {
+        @Override
+        public void onChanged(@NotNull Map<String, Movie> stringMovieMap) {
+            if (stringMovieMap.size() == 0) {
+                savedBtnString.postValue(false);
+                return;
+            }
+
+            for (Map.Entry<String, Movie> entry : stringMovieMap.entrySet()) {
+                String key = entry.getKey();
+                Movie movie = entry.getValue();
+                if (movie.getId() == currentMovieId) {
+                    savedBtnString.postValue(true);
+                    currentMovieKey = key;
+                    break;
+                } else {
+                    savedBtnString.postValue(false);
+                }
+            }
+        }
+    };
 
     public boolean isUserSignedIn() {
         return firebaseRepository.isUserSignedIn();
     }
 
-    public void removeFavorite(int id) {
-        firebaseRepository.removeFavoriteMovie(id);
+    public void removeFavorite() {
+        handler.post(() -> firebaseRepository.removeFavoriteMovie(this.currentMovieKey));
     }
 
-    private class AsyncCheck extends AsyncTask<Integer, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(Integer... integers) {
-
-            Collection<Movie> movies = firebaseListener.getFavoriteMovies().values();
-            for (Movie movie : movies) {
-                if (movie.getId() == integers[0]) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
+    public void stopObserver() {
+        this.firebaseListener.getFavoriteMoviesLiveData().removeObserver(mapObserver);
     }
 }

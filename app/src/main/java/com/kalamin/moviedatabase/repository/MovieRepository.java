@@ -34,12 +34,10 @@ public class MovieRepository {
         this.reader = Reader.getInstance(applicationContext);
     }
 
-    public LiveData<List<Movie>> discoverMovies() throws ExecutionException, InterruptedException {
-        MutableLiveData<List<Movie>> listLiveData = new MutableLiveData<>();
+    public List<Movie> discoverMovies() throws ExecutionException, InterruptedException {
         String jsonResult = new MoviesRestService().execute(this.reader.getDiscoverMoviesEndPoint(1)).get();
-        listLiveData.postValue(readJson(jsonResult));
 
-        return listLiveData;
+        return readJson(jsonResult);
     }
 
     public Movie getMovie(@NotNull String id) {
@@ -57,9 +55,7 @@ public class MovieRepository {
         return null;
     }
 
-    public LiveData<MovieDetails> getMovieDetails(int id) {
-        MutableLiveData<MovieDetails> movieDetailsMutableLiveData = new MutableLiveData<>();
-
+    public MovieDetails getMovieDetails(int id) {
         try {
             String jsonResult = new MoviesRestService().execute(this.reader.getMovieDetailsEndPoint(String.valueOf(id))).get();
             Object document = Configuration.defaultConfiguration()
@@ -80,14 +76,12 @@ public class MovieRepository {
             int runtime = (int) ((JsonPath.read(document, "$['runtime']") == null) ? 0 : JsonPath.read(document, "$['runtime']"));
 
             double popularity = ((Number) ((JsonPath.read(document, "$['popularity']") == null) ? 0 : JsonPath.read(document, "$['popularity']"))).doubleValue();
-            MovieDetails movieDetails = new MovieDetails(movieId, title, overview, posterPath, releaseDate, averageVote, runtime, popularity);
-
-            movieDetailsMutableLiveData.postValue(movieDetails);
+            return new MovieDetails(movieId, title, overview, posterPath, releaseDate, averageVote, runtime, popularity);
 
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        return movieDetailsMutableLiveData;
+        return null;
 
     }
 
@@ -114,7 +108,6 @@ public class MovieRepository {
                     ((Number) movies.get(i).get("vote_average")).doubleValue()
             ));
         }
-
         return movieList;
     }
 

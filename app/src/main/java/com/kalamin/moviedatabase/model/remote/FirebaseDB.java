@@ -46,11 +46,10 @@ public class FirebaseDB {
                 .removeValue();
     }
 
-    public void removeFavoriteMovie(int id, Map<String, Movie> favoriteMoviesMap, String userId) {
-        String key = findKey(favoriteMoviesMap, id);
+    public void removeFavoriteMovie(String key, String userId) {
         databaseFavoriteMoviesReference
                 .child(userId)
-                .child(key)
+                .child(String.valueOf(key))
                 .removeValue();
     }
 
@@ -67,15 +66,6 @@ public class FirebaseDB {
         return map.entrySet()
                 .stream()
                 .filter(entry -> Objects.equals(entry.getValue(), movie))
-                .map(Map.Entry::getKey).findFirst().get();
-    }
-
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
-    @NotNull
-    private String findKey(@NotNull Map<String, Movie> map, int id) {
-        return map.entrySet()
-                .stream()
-                .filter(entry -> Objects.equals(entry.getValue().getId(), id))
                 .map(Map.Entry::getKey).findFirst().get();
     }
 
