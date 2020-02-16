@@ -16,4 +16,10 @@
 
     <string name="account">Account</string>
     <string name="search_movies">Search movies</string>
+    <string name="actors">Top Cast</string>
+    <string name="biography">Biography</string>
+    <string name="gallery">Gallery</string>
+
+    <string name="you_haven_t_added_any_movie_to_your_favorite_movies_list">You haven\'t added any movie to your favorite movies list</string>
+    <string name="no_available_images">No available images</string>
 </resources>

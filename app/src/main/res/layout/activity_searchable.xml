@@ -1,37 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.activities.SearchableActivity"
+    android:background="@color/background"
     android:orientation="vertical"
-    >
+    tools:context=".views.activities.SearchableActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/background"
-        android:elevation="4dp"
-        android:minHeight="56dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        />
+    <include layout="@layout/toolbar" />
 
     <TextView
         android:id="@+id/search_results"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         android:text="Search results"
-        android:visibility="gone"
         android:textColor="@color/primaryText"
         android:textSize="40sp"
-        android:padding="10dp"
-        />
+        android:visibility="gone" />
 
-    <ListView
-        android:id="@+id/list_view"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/background"/>
+        app:tabBackground="@drawable/tab_background"
+        app:tabIndicatorColor="@color/button"
+        app:tabSelectedTextColor="@color/primaryText"
+        app:tabTextColor="@color/secondaryText" />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </LinearLayout>

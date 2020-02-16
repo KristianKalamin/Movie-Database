@@ -10,7 +10,7 @@ public final class Toast {
     }
 
     public static void showErrorMsg(Context context, @NotNull Codes errorCode) {
-        switch (errorCode){
+        switch (errorCode) {
             case INCORRECT_EMAIL:
                 android.widget.Toast.makeText(context, "Incorrect email", android.widget.Toast.LENGTH_SHORT).show();
                 break;

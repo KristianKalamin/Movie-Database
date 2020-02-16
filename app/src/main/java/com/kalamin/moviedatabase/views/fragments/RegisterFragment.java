@@ -12,7 +12,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
@@ -58,8 +58,8 @@ public class RegisterFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        view.findViewById(R.id.backArrow).setOnClickListener(v -> getFragmentManager().popBackStackImmediate());
-        registerViewModel = ViewModelProviders.of(getActivity()).get(RegisterViewModel.class);
+        view.findViewById(R.id.backArrow).setOnClickListener(v -> getParentFragmentManager().popBackStackImmediate());
+        registerViewModel = new ViewModelProvider(getActivity()).get(RegisterViewModel.class);
 
         view.findViewById(R.id.btnRegister).setOnClickListener(v -> {
             txtUsername = view.findViewById(R.id.username);
@@ -112,7 +112,5 @@ public class RegisterFragment extends Fragment {
                 });
             }
         });
-
     }
-
 }

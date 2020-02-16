@@ -8,7 +8,7 @@
     <color name="primaryText">#ffffff</color>
     <color name="secondaryText">#b3b3b3</color>
     <color name="disabledText">#808080</color>
-    <color name="blackText">#000000</color>
+    <color name="black">#000000</color>
 
     <color name="button">#ffcc00</color>
 </resources>

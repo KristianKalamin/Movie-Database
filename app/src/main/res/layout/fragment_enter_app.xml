@@ -8,8 +8,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:layout_margin="20dp"
+        android:orientation="vertical"
         tools:context=".views.ui.fragments.EnterAppFragment">
 
         <TextView
@@ -30,9 +30,9 @@
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="@string/login"
             android:backgroundTint="@color/button"
-            android:textColor="@color/blackText"/>
+            android:text="@string/login"
+            android:textColor="@color/black" />
 
         <Space
             android:layout_width="match_parent"
@@ -42,9 +42,9 @@
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="@string/create_an_account"
             android:backgroundTint="@color/button"
-            android:textColor="@color/blackText"/>
+            android:text="@string/create_an_account"
+            android:textColor="@color/black" />
 
         <Space
             android:layout_width="match_parent"
@@ -55,16 +55,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/or"
-            android:textColor="@color/secondaryText"
             android:textAlignment="center"
+            android:textColor="@color/secondaryText"
             android:textSize="14sp" />
 
         <Button
             android:id="@+id/btnNotNow"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="@string/later"
             android:backgroundTint="@color/button"
-            android:textColor="@color/blackText"/>
+            android:text="@string/later"
+            android:textColor="@color/black" />
     </LinearLayout>
 </FrameLayout>

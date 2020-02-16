@@ -11,20 +11,21 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.kalamin.moviedatabase.R;
-import com.kalamin.moviedatabase.model.entity.Movie;
+import com.kalamin.moviedatabase.model.entity.Frame;
 import com.kalamin.moviedatabase.utils.Extra;
-import com.kalamin.moviedatabase.views.activities.MovieDetailActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class SearchAdapter implements ListAdapter {
     private Context context;
-    private List<Movie> movies;
+    private List<? extends Frame> frames;
+    private Class<?> destinationActivity;
 
-    public SearchAdapter(Context context, List<Movie> movies) {
+    public SearchAdapter(Context context, List<? extends Frame> frames, Class<?> destinationActivity) {
         this.context = context;
-        this.movies = movies;
+        this.frames = frames;
+        this.destinationActivity = destinationActivity;
     }
 
     @Override
@@ -49,17 +50,17 @@ public class SearchAdapter implements ListAdapter {
 
     @Override
     public int getCount() {
-        return movies.size();
+        return frames.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return movies.get(position);
+        return frames.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return movies.get(position).getId();
+        return Long.valueOf(frames.get(position).getId());
     }
 
     @Override
@@ -69,21 +70,21 @@ public class SearchAdapter implements ListAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-       Movie movie = movies.get(position);
+        Frame frame = frames.get(position);
 
-       if (convertView == null) {
-           LayoutInflater layoutInflater = LayoutInflater.from(context);
-           convertView = layoutInflater.inflate(R.layout.list_row, parent, false);
-           convertView.setOnClickListener(v -> {
-               Intent intent = new Intent(context, MovieDetailActivity.class);
-               intent.putExtra(Extra.MOVIE_ID, movie.getId());
-               context.startActivity(intent);
-           });
-       }
+        if (convertView == null) {
+            LayoutInflater layoutInflater = LayoutInflater.from(context);
+            convertView = layoutInflater.inflate(R.layout.list_row, parent, false);
+            convertView.setOnClickListener(v -> {
+                Intent intent = new Intent(context, destinationActivity);
+                intent.putExtra(Extra.SEARCH_ITEM_ID, frame.getId());
+                context.startActivity(intent);
+            });
+        }
         TextView movieTitle = convertView.findViewById(R.id.list_movie_title);
         ImageView imageView = convertView.findViewById(R.id.list_movie_poster);
-        movieTitle.setText(movie.getTitle());
-        Picasso.get().load(movie.getPosterPath()).fit().centerCrop().into(imageView);
+        movieTitle.setText(frame.getName());
+        Picasso.get().load(frame.getPosterPath()).fit().centerCrop().into(imageView);
 
         return convertView;
     }
@@ -95,7 +96,7 @@ public class SearchAdapter implements ListAdapter {
 
     @Override
     public int getViewTypeCount() {
-        return movies.size();
+        return frames.size();
     }
 
     @Override

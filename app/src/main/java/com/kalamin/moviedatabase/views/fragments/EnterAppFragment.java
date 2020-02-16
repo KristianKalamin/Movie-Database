@@ -19,12 +19,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public class EnterAppFragment extends Fragment {
+    private static int parentActivityId;
+
     public EnterAppFragment() {
     }
 
     @NotNull
-    @Contract(" -> new")
-    public static EnterAppFragment newInstance() {
+    @Contract("_ -> new")
+    public static EnterAppFragment newInstance(int activityId) {
+        parentActivityId = activityId;
         return new EnterAppFragment();
     }
 
@@ -36,9 +39,9 @@ public class EnterAppFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        view.findViewById(R.id.btnLogin).setOnClickListener(v -> ((NavigationHost) Objects.requireNonNull(getActivity())).navigateTo(LoginFragment.newInstance(), true));
+        view.findViewById(R.id.btnLogin).setOnClickListener(v -> ((NavigationHost) Objects.requireNonNull(getActivity())).navigateTo(parentActivityId, LoginFragment.newInstance(), true));
 
-        view.findViewById(R.id.btnRegister).setOnClickListener(v -> ((NavigationHost) Objects.requireNonNull(getActivity())).navigateTo(RegisterFragment.newInstance(), true));
+        view.findViewById(R.id.btnRegister).setOnClickListener(v -> ((NavigationHost) Objects.requireNonNull(getActivity())).navigateTo(parentActivityId, RegisterFragment.newInstance(), true));
 
         view.findViewById(R.id.btnNotNow).setOnClickListener(v -> {
             Objects.requireNonNull(getActivity()).finish();

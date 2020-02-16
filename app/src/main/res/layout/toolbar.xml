@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_main"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/appBar"
+        android:elevation="4dp"
+        android:minHeight="56dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+</merge>

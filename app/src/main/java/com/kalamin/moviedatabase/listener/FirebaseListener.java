@@ -19,7 +19,7 @@ import java.util.Map;
 public class FirebaseListener {
     private MovieRepository movieRepository;
     private static FirebaseListener firebaseListener = null;
-    private MutableLiveData<Map<String, Movie>> favoriteMoviesLiveData;
+    public static MutableLiveData<Map<String, Movie>> favoriteMoviesLiveData;
     private DatabaseReference reference;
     private Context context;
 
@@ -43,7 +43,7 @@ public class FirebaseListener {
         reference.addValueEventListener(valueEventListener);
     }
 
-    private ValueEventListener valueEventListener =  new ValueEventListener() {
+    private ValueEventListener valueEventListener = new ValueEventListener() {
         @SuppressWarnings("unchecked")
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -70,7 +70,4 @@ public class FirebaseListener {
         reference.removeEventListener(valueEventListener);
     }
 
-    public MutableLiveData<Map<String, Movie>> getFavoriteMoviesLiveData() {
-        return favoriteMoviesLiveData;
-    }
 }

@@ -9,7 +9,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.kalamin.moviedatabase.R;
 import com.kalamin.moviedatabase.repository.FirebaseRepository;
@@ -24,13 +24,15 @@ import org.jetbrains.annotations.NotNull;
 public class AccountFragment extends Fragment {
     private AccountViewModel accountViewModel;
     private FirebaseRepository firebaseRepository;
+    private static int parentActivityId;
 
     public AccountFragment() {
     }
 
     @NotNull
-    @Contract(" -> new")
-    public static AccountFragment newInstance() {
+    @Contract("_ -> new")
+    public static AccountFragment newInstance(int activityId) {
+        parentActivityId = activityId;
         return new AccountFragment();
     }
 
@@ -43,17 +45,19 @@ public class AccountFragment extends Fragment {
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        accountViewModel = ViewModelProviders.of(getActivity()).get(AccountViewModel.class);
+        getActivity().setTitle("User Account");
+
+        accountViewModel = new ViewModelProvider(getActivity()).get(AccountViewModel.class);
         firebaseRepository = FirebaseRepository.getInstance(getContext());
         EditText txtUsername = view.findViewById(R.id.username);
         EditText txtEmail = view.findViewById(R.id.email);
 
-        firebaseRepository.getUserLiveData().observe(this, user -> {
+        firebaseRepository.getUserLiveData().observe(getViewLifecycleOwner(), user -> {
             txtEmail.setText(user.getEmail());
             txtUsername.setText(user.getUsername());
         });
 
-        view.findViewById(R.id.btnSave).setOnClickListener(v->{
+        view.findViewById(R.id.btnSave).setOnClickListener(v -> {
             EditText txtOldPassword = view.findViewById(R.id.old_password);
             EditText txtNewPassword = view.findViewById(R.id.new_password);
 
@@ -69,15 +73,14 @@ public class AccountFragment extends Fragment {
                 firebaseRepository.setNewUserPassword(newPassword);
                 Toast.showInfo(getContext(), "Updated");
                 firebaseRepository.logout();
-                ((NavigationHost)getActivity()).navigateTo(LoginFragment.newInstance(), false);
-
+                ((NavigationHost) getActivity()).navigateTo(parentActivityId, LoginFragment.newInstance(), false);
             }
         });
 
         view.findViewById(R.id.btnLogout).setOnClickListener(v -> {
             firebaseRepository.logout();
             Toast.showInfo(getContext(), "Logged out");
-            getFragmentManager().popBackStackImmediate();
+            getParentFragmentManager().popBackStackImmediate();
         });
     }
 }

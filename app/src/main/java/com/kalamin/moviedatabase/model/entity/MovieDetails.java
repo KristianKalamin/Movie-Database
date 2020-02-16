@@ -3,6 +3,9 @@ package com.kalamin.moviedatabase.model.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 public class MovieDetails implements Parcelable {
     private int id;
     private String title;
@@ -31,7 +34,7 @@ public class MovieDetails implements Parcelable {
         this.popularity = popularity;
     }
 
-    protected MovieDetails(Parcel in) {
+    protected MovieDetails(@NotNull Parcel in) {
         id = in.readInt();
         title = in.readString();
         overview = in.readString();
@@ -43,11 +46,15 @@ public class MovieDetails implements Parcelable {
     }
 
     public static final Creator<MovieDetails> CREATOR = new Creator<MovieDetails>() {
+        @NotNull
+        @Contract("_ -> new")
         @Override
         public MovieDetails createFromParcel(Parcel in) {
             return new MovieDetails(in);
         }
 
+        @NotNull
+        @Contract(value = "_ -> new", pure = true)
         @Override
         public MovieDetails[] newArray(int size) {
             return new MovieDetails[size];
@@ -118,6 +125,7 @@ public class MovieDetails implements Parcelable {
         this.popularity = popularity;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "MovieDetails{" +
@@ -138,7 +146,7 @@ public class MovieDetails implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NotNull Parcel dest, int flags) {
         dest.writeInt(id);
         dest.writeString(title);
         dest.writeString(overview);

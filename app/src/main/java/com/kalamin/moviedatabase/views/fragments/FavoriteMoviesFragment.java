@@ -2,7 +2,6 @@ package com.kalamin.moviedatabase.views.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,8 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.kalamin.moviedatabase.R;
 import com.kalamin.moviedatabase.utils.Extra;
 import com.kalamin.moviedatabase.viewmodels.FavoriteMoviesViewModel;
-import com.kalamin.moviedatabase.views.activities.MovieDetailActivity;
-import com.kalamin.moviedatabase.views.activities.adapters.MoviesCardRecyclerViewAdapter;
+import com.kalamin.moviedatabase.views.activities.MovieDetailsActivity;
+import com.kalamin.moviedatabase.views.activities.adapters.MovieAdapter;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +32,7 @@ public class FavoriteMoviesFragment extends Fragment {
     private FavoriteMoviesViewModel favoriteMoviesViewModel;
     private TextView msg;
     private RecyclerView recyclerView;
-    private MoviesCardRecyclerViewAdapter adapter;
+    private MovieAdapter adapter;
     private ProgressBar progressBar;
 
     public FavoriteMoviesFragment() {
@@ -51,6 +50,7 @@ public class FavoriteMoviesFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_favorites_movies, container, false);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.recycler_view);
@@ -59,13 +59,15 @@ public class FavoriteMoviesFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
 
         msg = view.findViewById(R.id.favorites_msg);
-
-        adapter = new MoviesCardRecyclerViewAdapter("favorite_movie");
-        recyclerView.setAdapter(adapter);
         progressBar = view.findViewById(R.id.favorite_movies_progress_bar);
 
+        adapter = new MovieAdapter("favorite_movie");
+        recyclerView.setAdapter(adapter);
+
+        getActivity().setTitle("Favorite Movies");
+
         adapter.setOnItemClickListener(movie -> {
-            Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+            Intent intent = new Intent(getActivity(), MovieDetailsActivity.class);
             intent.putExtra(Extra.MOVIE_ID, movie.getId());
 
             startActivityForResult(intent, SHOW_MOVIE_DETAILS);
@@ -76,7 +78,7 @@ public class FavoriteMoviesFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        favoriteMoviesViewModel = ViewModelProviders.of(this).get(FavoriteMoviesViewModel.class);
+        favoriteMoviesViewModel = new ViewModelProvider(this).get(FavoriteMoviesViewModel.class);
         favoriteMoviesViewModel.getFavoriteMovies().observeForever(stringMovieMap -> {
             progressBar.setVisibility(View.GONE);
             if (stringMovieMap.size() == 0)
@@ -84,7 +86,7 @@ public class FavoriteMoviesFragment extends Fragment {
             else {
                 msg.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
-                adapter.setMovies(new ArrayList<>(stringMovieMap.values()));
+                adapter.submitList(new ArrayList<>(stringMovieMap.values()));
             }
         });
 
@@ -99,7 +101,6 @@ public class FavoriteMoviesFragment extends Fragment {
                 favoriteMoviesViewModel.deleteFavoriteMovie(adapter.getMovieAt(viewHolder.getAdapterPosition()));
             }
         }).attachToRecyclerView(recyclerView);
-
     }
 
     @Override

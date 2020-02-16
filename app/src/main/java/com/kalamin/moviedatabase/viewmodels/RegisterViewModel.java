@@ -19,7 +19,7 @@ public class RegisterViewModel extends AndroidViewModel {
     public Codes checkCredentials(@NotNull String username, @NotNull String email, @NotNull String password) {
         if (username.length() == 0 || email.length() == 0 || password.length() == 0)
             return Codes.EMPTY_FIELD;
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches() ) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             return Codes.INCORRECT_EMAIL;
         }
         if (password.length() < 6)

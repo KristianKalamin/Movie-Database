@@ -17,6 +17,10 @@ public final class Reader {
     private String discoverMoviesEndPoint;
     private String posterEndPoint;
     private String movieDetailsEndPoint;
+    private String creditsEndPoint;
+    private String actorEndPoint;
+    private String actorImagesEndPoint;
+    private String searchActorsEndPoint;
 
     private static Reader reader = null;
     private Context appContext;
@@ -55,18 +59,42 @@ public final class Reader {
         JSONObject endPoints;
         try {
             endPoints = new JSONObject(json).getJSONObject("end-points");
-            this.searchMovieEndPoint = endPoints.getString("search");
+            this.searchMovieEndPoint = endPoints.getString("search-movies");
             this.discoverMoviesEndPoint = endPoints.getString("discover");
             this.posterEndPoint = endPoints.getString("poster");
             this.movieDetailsEndPoint = endPoints.getString("details");
+            this.creditsEndPoint = endPoints.getString("credits");
+            this.actorEndPoint = endPoints.getString("actor");
+            this.actorImagesEndPoint = endPoints.getString("actor-images");
+            this.searchActorsEndPoint = endPoints.getString("search-actors");
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     @NotNull
-    public String getMovieDetailsEndPoint(String movie_id) {
-        return this.movieDetailsEndPoint.replace("{MOVIE-ID}", movie_id);
+    public String getSearchActorsEndPoint(String query) {
+        return this.searchActorsEndPoint.replace("{QUERY}", query);
+    }
+
+    @NotNull
+    public String getActorEndPoint(String actorId) {
+        return this.actorEndPoint.replace("{ACTOR_ID}", actorId);
+    }
+
+    @NotNull
+    public String getActorImagesEndPoint(String actorId) {
+        return this.actorImagesEndPoint.replace("{ACTOR_ID}", actorId);
+    }
+
+    @NotNull
+    public String getCreditsEndPoint(String movieId) {
+        return this.creditsEndPoint.replace("{MOVIE-ID}", movieId);
+    }
+
+    @NotNull
+    public String getMovieDetailsEndPoint(String movieId) {
+        return this.movieDetailsEndPoint.replace("{MOVIE-ID}", movieId);
     }
 
     @NotNull

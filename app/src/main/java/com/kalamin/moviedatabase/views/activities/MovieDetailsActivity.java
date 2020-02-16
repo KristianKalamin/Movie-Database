@@ -2,8 +2,6 @@ package com.kalamin.moviedatabase.views.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,21 +9,18 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.kalamin.moviedatabase.R;
-import com.kalamin.moviedatabase.listener.InternetConnectionReceiver;
 import com.kalamin.moviedatabase.model.entity.MovieDetails;
+import com.kalamin.moviedatabase.utils.Extra;
 import com.kalamin.moviedatabase.viewmodels.MovieDetailsViewModel;
 import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
-import static com.kalamin.moviedatabase.utils.Extra.MOVIE_ID;
-
-public class MovieDetailActivity extends AppCompatActivity {
+public class MovieDetailsActivity extends BaseActivity {
     private TextView txtRuntime;
     private TextView txtTitle;
     private TextView txtOverview;
@@ -36,8 +31,6 @@ public class MovieDetailActivity extends AppCompatActivity {
     private Button btnAddToFavorite;
     private ProgressBar progressBar;
 
-    private InternetConnectionReceiver internetConnectionReceiver;
-
     private MovieDetailsViewModel movieDetailsViewModel;
 
     @Override
@@ -45,16 +38,13 @@ public class MovieDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
-        if (savedInstanceState == null) {
-            internetConnectionReceiver = new InternetConnectionReceiver();
-            this.registerReceiver(internetConnectionReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        setToolbarWithBackButton();
 
-            internetConnectionReceiver.setInternetConnectionListener(isConnected -> {
-                if (!isConnected) {
-                    startActivity(new Intent(MovieDetailActivity.this, NoInternetActivity.class));
-                }
-            });
-        }
+        internetConnectionReceiver().setInternetConnectionListener(isConnected -> {
+            if (!isConnected) {
+                startActivity(new Intent(MovieDetailsActivity.this, NoInternetActivity.class));
+            }
+        });
 
         txtTitle = findViewById(R.id.txtTitle);
         txtRuntime = findViewById(R.id.txtRuntime);
@@ -65,15 +55,20 @@ public class MovieDetailActivity extends AppCompatActivity {
         imageView = findViewById(R.id.poster);
         btnAddToFavorite = findViewById(R.id.btnAddToFavorite);
         progressBar = findViewById(R.id.progressBar);
+
         Intent intent = getIntent();
-        int movieId = intent.getIntExtra(MOVIE_ID, 0);
-        movieDetailsViewModel = ViewModelProviders.of(this).get(MovieDetailsViewModel.class);
+        String movieId = intent.getStringExtra(Extra.MOVIE_ID);
+        if (movieId == null)
+            movieId = intent.getStringExtra(Extra.SEARCH_ITEM_ID);
+
+        movieDetailsViewModel = new ViewModelProvider(this).get(MovieDetailsViewModel.class);
 
         movieDetailsViewModel.askForMovie(movieId);
         movieDetailsViewModel.getMovieObservable().observeForever(movieDetailsObserver);
         movieDetailsViewModel.isMovieFavorite();
 
         if (movieDetailsViewModel.isUserSignedIn()) {
+            btnAddToFavorite.setVisibility(View.VISIBLE);
             movieDetailsViewModel.getSavedBtnStringObservable().observeForever(isFavoriteObserver);
         }
     }
@@ -99,6 +94,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     };
 
     private Observer<MovieDetails> movieDetailsObserver = new Observer<MovieDetails>() {
+        @SuppressLint("SetTextI18n")
         @Override
         public void onChanged(MovieDetails md) {
             if (md != null) {
@@ -107,22 +103,22 @@ public class MovieDetailActivity extends AppCompatActivity {
                 findViewById(R.id.movie_details_layout).setVisibility(View.VISIBLE);
 
                 txtTitle.setText(md.getTitle());
-                txtRuntime.setText(String.valueOf(md.getRuntime()));
+                txtRuntime.setText(md.getRuntime() + " min");
                 txtOverview.setText(md.getOverview());
                 txtAverageVote.setText(String.valueOf(md.getAverageVote()));
                 txtPopularity.setText(String.valueOf(md.getPopularity()));
                 txtReleaseDate.setText(md.getReleaseDate());
-                Picasso.get().load(md.getPosterPath()).fit().into(imageView);
+                Picasso.get().load(md.getPosterPath()).fit().centerCrop().into(imageView);
+                movieDetailsViewModel.getMovieObservable().removeObserver(movieDetailsObserver);
             }
         }
     };
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-        movieDetailsViewModel.getMovieObservable().removeObserver(movieDetailsObserver);
         movieDetailsViewModel.getSavedBtnStringObservable().removeObserver(isFavoriteObserver);
         movieDetailsViewModel.stopObserver();
-        this.unregisterReceiver(internetConnectionReceiver);
+        super.onDestroy();
     }
+
 }

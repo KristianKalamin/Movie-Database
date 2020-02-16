@@ -1,6 +1,8 @@
 package com.kalamin.moviedatabase.viewmodels;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -14,21 +16,19 @@ import java.util.Map;
 
 public class FavoriteMoviesViewModel extends AndroidViewModel {
     private FirebaseRepository firebaseRepository;
-    private FirebaseListener firebaseListener;
-    private MutableLiveData<Map<String, Movie>> favoriteMovies;
+    private Handler handler;
 
     public FavoriteMoviesViewModel(@NonNull Application application) {
         super(application);
         firebaseRepository = FirebaseRepository.getInstance(getApplication().getApplicationContext());
-        firebaseListener = FirebaseListener.getInstance(getApplication().getApplicationContext());
-        favoriteMovies = firebaseListener.getFavoriteMoviesLiveData();
+        handler = new Handler(Looper.getMainLooper());
     }
 
     public MutableLiveData<Map<String, Movie>> getFavoriteMovies() {
-        return favoriteMovies;
+        return FirebaseListener.favoriteMoviesLiveData;
     }
 
     public void deleteFavoriteMovie(Movie movie) {
-        firebaseRepository.removeFavoriteMovie(movie);
+        handler.post(() -> firebaseRepository.removeFavoriteMovie(movie));
     }
 }

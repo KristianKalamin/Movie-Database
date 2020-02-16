@@ -2,6 +2,7 @@ package com.kalamin.moviedatabase.viewmodels;
 
 import android.app.Application;
 import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -20,25 +21,24 @@ import java.util.Map;
 
 public class MovieDetailsViewModel extends AndroidViewModel {
     private MovieRepository movieRepository;
-    private FirebaseListener firebaseListener;
     private FirebaseRepository firebaseRepository;
     private MutableLiveData<Boolean> savedBtnString = new MutableLiveData<>(false);
     private MutableLiveData<MovieDetails> movie = new MutableLiveData<>();
     private Handler handler;
     private String currentMovieKey;
-    private int currentMovieId;
+    private String currentMovieId;
 
     public MovieDetailsViewModel(@NonNull Application application) {
         super(application);
         movieRepository = MovieRepository.getInstance(getApplication().getApplicationContext());
         firebaseRepository = FirebaseRepository.getInstance(getApplication().getApplicationContext());
-        firebaseListener = FirebaseListener.getInstance(getApplication().getApplicationContext());
-        handler = new Handler(application.getMainLooper());
+
+        handler = new Handler(Looper.getMainLooper());
     }
 
-    public void askForMovie(int id) {
+    public void askForMovie(String id) {
         currentMovieId = id;
-        handler.post(() -> movie.postValue(movieRepository.getMovieDetails(id)));
+        handler.postDelayed(() -> movie.postValue(movieRepository.getMovieDetails(id)), 500);
     }
 
     public MutableLiveData<MovieDetails> getMovieObservable() {
@@ -50,11 +50,11 @@ public class MovieDetailsViewModel extends AndroidViewModel {
     }
 
     public void addToFavorite() {
-        handler.post(() -> firebaseRepository.addFavoriteMovie(String.valueOf(currentMovieId)));
+        handler.postDelayed(() -> firebaseRepository.addFavoriteMovie(String.valueOf(currentMovieId)), 200);
     }
 
     public void isMovieFavorite() {
-        this.firebaseListener.getFavoriteMoviesLiveData().observeForever(mapObserver);
+        FirebaseListener.favoriteMoviesLiveData.observeForever(mapObserver);
     }
 
     private Observer<Map<String, Movie>> mapObserver = new Observer<Map<String, Movie>>() {
@@ -68,7 +68,7 @@ public class MovieDetailsViewModel extends AndroidViewModel {
             for (Map.Entry<String, Movie> entry : stringMovieMap.entrySet()) {
                 String key = entry.getKey();
                 Movie movie = entry.getValue();
-                if (movie.getId() == currentMovieId) {
+                if (movie.getId().equals(currentMovieId)) {
                     savedBtnString.postValue(true);
                     currentMovieKey = key;
                     break;
@@ -84,10 +84,10 @@ public class MovieDetailsViewModel extends AndroidViewModel {
     }
 
     public void removeFavorite() {
-        handler.post(() -> firebaseRepository.removeFavoriteMovie(this.currentMovieKey));
+        handler.postDelayed(() -> firebaseRepository.removeFavoriteMovie(this.currentMovieKey), 200);
     }
 
     public void stopObserver() {
-        this.firebaseListener.getFavoriteMoviesLiveData().removeObserver(mapObserver);
+        FirebaseListener.favoriteMoviesLiveData.removeObserver(mapObserver);
     }
 }

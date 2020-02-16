@@ -5,27 +5,28 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kalamin.moviedatabase.R;
 import com.kalamin.moviedatabase.utils.Extra;
 import com.kalamin.moviedatabase.viewmodels.HomeViewModel;
-import com.kalamin.moviedatabase.views.activities.MovieDetailActivity;
-import com.kalamin.moviedatabase.views.activities.adapters.MoviesCardRecyclerViewAdapter;
+import com.kalamin.moviedatabase.views.activities.MovieDetailsActivity;
+import com.kalamin.moviedatabase.views.activities.adapters.MovieAdapter;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public class HomeFragment extends Fragment {
-    private static final int SHOW_MOVIE_DETAILS = 1;
     private HomeViewModel homeViewModel;
-    private MoviesCardRecyclerViewAdapter adapter;
+    private MovieAdapter adapter;
+    private ProgressBar progressBar;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -44,31 +45,32 @@ public class HomeFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        progressBar = view.findViewById(R.id.progressBar);
+        getActivity().setTitle("Movie Database");
 
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerView.setHasFixedSize(true);
 
-        adapter = new MoviesCardRecyclerViewAdapter("movie");
+        adapter = new MovieAdapter("card");
         recyclerView.setAdapter(adapter);
-        homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
-        //homeViewModel.getDiscoveredMovies().observe(this, adapter::setMovies);
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+
+        homeViewModel.getDiscoveredMovies().observeForever(movies -> {
+            adapter.submitList(movies);
+            progressBar.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        });
 
         adapter.setOnItemClickListener(movie -> {
-            Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+            Intent intent = new Intent(getContext(), MovieDetailsActivity.class);
             intent.putExtra(Extra.MOVIE_ID, movie.getId());
 
-            startActivityForResult(intent, SHOW_MOVIE_DETAILS);
+            startActivity(intent);
         });
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        homeViewModel.getDiscoveredMovies().observeForever(adapter::setMovies);
     }
 
     @Override

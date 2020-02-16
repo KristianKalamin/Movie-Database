@@ -26,14 +26,13 @@ public class HomeViewModel extends AndroidViewModel {
         discoveredMovies = new MutableLiveData<>();
         firebaseRepository = FirebaseRepository.getInstance(application.getApplicationContext());
 
-        handler.post(() -> {
+        handler.postDelayed(() -> {
             try {
                 discoveredMovies.postValue(movieRepository.discoverMovies());
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
-        });
-
+        }, 250);
     }
 
     public LiveData<List<Movie>> getDiscoveredMovies() {
