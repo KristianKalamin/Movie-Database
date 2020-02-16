@@ -49,6 +49,7 @@
                     android:id="@+id/actor_name_age"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
                     android:text="Actor (50)"
                     android:textAlignment="textStart"
                     android:textColor="@color/primaryText"
