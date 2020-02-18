@@ -3,10 +3,10 @@ package com.kalamin.moviedatabase.views.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
-import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 
+import com.github.chrisbanes.photoview.PhotoView;
 import com.kalamin.moviedatabase.R;
 import com.kalamin.moviedatabase.utils.Extra;
 import com.squareup.picasso.Picasso;
@@ -25,7 +25,7 @@ public class PictureActivity extends BaseActivity {
             }
         });
 
-        ImageView image = findViewById(R.id.image);
+        PhotoView image = findViewById(R.id.image);
         Intent intent = getIntent();
         String url = intent.getStringExtra(Extra.URL);
         Picasso.get().load(url).into(image);
