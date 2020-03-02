@@ -45,6 +45,7 @@
                 android:backgroundTint="@color/button"
                 android:text="Add to favorite"
                 android:textColor="@color/black"
+                android:visibility="gone"
                 app:icon="@drawable/ic_action_heart"
                 app:iconTint="@color/black"
                 app:layout_constraintEnd_toEndOf="parent"
