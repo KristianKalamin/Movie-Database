@@ -17,7 +17,7 @@ public class NoInternetActivity extends BaseActivity {
             }
         });
 
-        findViewById(R.id.btnExit).setOnClickListener(v -> this.finish());
+        findViewById(R.id.btnExit).setOnClickListener(v -> this.finishAffinity());
     }
 
     @Override
