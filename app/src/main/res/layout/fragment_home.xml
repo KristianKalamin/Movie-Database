@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginEnd="8dp"
     android:background="@color/background"
     android:orientation="vertical"
     tools:context=".views.fragments.HomeFragment">
@@ -19,7 +20,6 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginEnd="9dp"
         android:background="@color/background"
         android:visibility="gone"
         tools:listitem="@layout/card" />
