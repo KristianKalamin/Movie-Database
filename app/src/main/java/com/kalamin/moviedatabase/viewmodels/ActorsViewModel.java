@@ -20,7 +20,7 @@ public class ActorsViewModel extends AndroidViewModel {
 
     public ActorsViewModel(@NonNull Application application) {
         super(application);
-        actorsRepository = ActorsRepository.getInstance(application.getApplicationContext());
+        actorsRepository = ActorsRepository.getInstance();
         handler = new Handler(Looper.getMainLooper());
     }
 

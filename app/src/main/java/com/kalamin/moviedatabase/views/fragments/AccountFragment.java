@@ -48,7 +48,7 @@ public class AccountFragment extends Fragment {
         getActivity().setTitle("User Account");
 
         accountViewModel = new ViewModelProvider(getActivity()).get(AccountViewModel.class);
-        firebaseRepository = FirebaseRepository.getInstance(getContext());
+        firebaseRepository = FirebaseRepository.getInstance();
         EditText txtUsername = view.findViewById(R.id.username);
         EditText txtEmail = view.findViewById(R.id.email);
 

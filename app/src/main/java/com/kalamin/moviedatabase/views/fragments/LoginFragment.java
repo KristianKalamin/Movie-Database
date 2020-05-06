@@ -62,7 +62,6 @@ public class LoginFragment extends Fragment {
         view.findViewById(R.id.backArrow).setOnClickListener(v -> getParentFragmentManager().popBackStackImmediate());
 
         view.findViewById(R.id.btnLogin).setOnClickListener(v -> {
-            progressDialog = new ProgressDialog(getContext());
             String email = txtEmail.getText().toString().trim();
             String password = txtPassword.getText().toString().trim();
             Codes code = loginViewModel.checkCredentials(email, password);
@@ -70,7 +69,7 @@ public class LoginFragment extends Fragment {
             if (code != Codes.OK) {
                 Toast.showErrorMsg(getActivity().getBaseContext(), code);
             } else {
-                FirebaseRepository firebaseRepository = FirebaseRepository.getInstance(getContext());
+                FirebaseRepository firebaseRepository = FirebaseRepository.getInstance();
                 progressDialog = new ProgressDialog(getActivity());
                 progressDialog.setMessage("Please wait");
                 progressDialog.show();

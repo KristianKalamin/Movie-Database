@@ -1,7 +1,6 @@
 package com.kalamin.moviedatabase.repository;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
@@ -27,14 +26,14 @@ public class MovieRepository {
     private static MovieRepository instance;
     private Reader reader;
 
-    public synchronized static MovieRepository getInstance(Context applicationContext) {
+    public synchronized static MovieRepository getInstance() {
         if (instance == null)
-            instance = new MovieRepository(applicationContext);
+            instance = new MovieRepository();
         return instance;
     }
 
-    private MovieRepository(Context applicationContext) {
-        this.reader = Reader.getInstance(applicationContext);
+    private MovieRepository() {
+        this.reader = Reader.getInstance();
     }
 
     public List<Movie> discoverMovies() throws ExecutionException, InterruptedException {
@@ -67,6 +66,10 @@ public class MovieRepository {
                     .jsonProvider()
                     .parse(jsonResult);
 
+            Integer statusCode = JsonPath.using((Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS))).parse(jsonResult).read("status_code");
+            if (statusCode != null)
+                return null;
+
             int movieId = JsonPath.read(document, "$['id']");
             String title = JsonPath.read(document, "$['title']");
             String overview = JsonPath.read(document, "$['overview']");
@@ -98,6 +101,7 @@ public class MovieRepository {
         return readJson(jsonResult);
     }
 
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     private List<Movie> readJson(String json) {
         List<Movie> movieList = new ArrayList<>();

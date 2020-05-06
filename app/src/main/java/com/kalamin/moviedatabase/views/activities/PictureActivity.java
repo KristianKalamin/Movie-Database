@@ -2,7 +2,6 @@ package com.kalamin.moviedatabase.views.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MotionEvent;
 
 import androidx.annotation.Nullable;
 
@@ -29,11 +28,5 @@ public class PictureActivity extends BaseActivity {
         Intent intent = getIntent();
         String url = intent.getStringExtra(Extra.URL);
         Picasso.get().load(url).into(image);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-
-        return false;
     }
 }

@@ -30,8 +30,8 @@ public class MovieDetailsViewModel extends AndroidViewModel {
 
     public MovieDetailsViewModel(@NonNull Application application) {
         super(application);
-        movieRepository = MovieRepository.getInstance(getApplication().getApplicationContext());
-        firebaseRepository = FirebaseRepository.getInstance(getApplication().getApplicationContext());
+        movieRepository = MovieRepository.getInstance();
+        firebaseRepository = FirebaseRepository.getInstance();
 
         handler = new Handler(Looper.getMainLooper());
     }

@@ -18,7 +18,7 @@ public class ActorDetailsViewModel extends AndroidViewModel {
 
     public ActorDetailsViewModel(@NonNull Application application) {
         super(application);
-        actorsRepository = ActorsRepository.getInstance(getApplication().getApplicationContext());
+        actorsRepository = ActorsRepository.getInstance();
         handler = new Handler(Looper.getMainLooper());
     }
 

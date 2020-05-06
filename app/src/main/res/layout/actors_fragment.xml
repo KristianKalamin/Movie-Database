@@ -8,14 +8,15 @@
     tools:context=".views.fragments.ActorsFragment">
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/txt_top_cast"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:text="@string/actors"
         android:textColor="@color/primaryText"
-        android:textSize="26sp" />
+        android:textSize="26sp"
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/actors_list_recycler_view"
@@ -23,6 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="-8dp"
         android:elevation="2dp"
+        android:visibility="gone"
         tools:listitem="@layout/card" />
 
 </LinearLayout>

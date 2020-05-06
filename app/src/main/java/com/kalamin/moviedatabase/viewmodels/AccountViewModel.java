@@ -15,7 +15,7 @@ public class AccountViewModel extends AndroidViewModel {
 
     public AccountViewModel(@NonNull Application application) {
         super(application);
-        firebaseRepository = FirebaseRepository.getInstance(application.getApplicationContext());
+        firebaseRepository = FirebaseRepository.getInstance();
     }
 
     public Codes checkCredentials(@NotNull String oldPassword, @NotNull String newPassword) {

@@ -1,7 +1,5 @@
 package com.kalamin.moviedatabase.listener;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
@@ -21,22 +19,20 @@ public class FirebaseListener {
     private static FirebaseListener firebaseListener = null;
     public static MutableLiveData<Map<String, Movie>> favoriteMoviesLiveData;
     private DatabaseReference reference;
-    private Context context;
 
-    public synchronized static FirebaseListener getInstance(Context context) {
+    public synchronized static FirebaseListener getInstance() {
         if (firebaseListener == null)
-            firebaseListener = new FirebaseListener(context);
+            firebaseListener = new FirebaseListener();
         return firebaseListener;
     }
 
-    private FirebaseListener(Context context) {
-        movieRepository = MovieRepository.getInstance(context);
-        this.context = context;
+    private FirebaseListener() {
+        movieRepository = MovieRepository.getInstance();
         favoriteMoviesLiveData = new MutableLiveData<>();
     }
 
     public void startFavoriteMoviesListener() {
-        FirebaseRepository firebaseRepository = FirebaseRepository.getInstance(context);
+        FirebaseRepository firebaseRepository = FirebaseRepository.getInstance();
         reference = firebaseRepository.getFavoriteMoviesReference()
                 .child(firebaseRepository.getUser().getFirebaseUser().getUid());
 

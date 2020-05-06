@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +30,8 @@ import java.util.List;
 public class ActorsFragment extends Fragment {
     private ActorsViewModel actorsViewModel;
     private ActorAdapter actorAdapter;
+    private TextView topCast;
+    private RecyclerView recyclerView;
 
     @NotNull
     @Contract(" -> new")
@@ -46,7 +49,9 @@ public class ActorsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         actorsViewModel = new ViewModelProvider(this).get(ActorsViewModel.class);
-        RecyclerView recyclerView = view.findViewById(R.id.actors_list_recycler_view);
+        recyclerView = view.findViewById(R.id.actors_list_recycler_view);
+        topCast = view.findViewById(R.id.txt_top_cast);
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setHasFixedSize(true);
@@ -64,7 +69,14 @@ public class ActorsFragment extends Fragment {
     private Observer<List<Actor>> actorObserver = new Observer<List<Actor>>() {
         @Override
         public void onChanged(List<Actor> actors) {
-            actorAdapter.setActors(actors);
+            if (actors != null) {
+                topCast.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.VISIBLE);
+                actorAdapter.setActors(actors);
+            } else {
+                topCast.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.GONE);
+            }
         }
     };
 

@@ -12,7 +12,7 @@ public class MainViewModel extends AndroidViewModel {
 
     public MainViewModel(@NonNull Application application) {
         super(application);
-        FirebaseRepository firebaseRepository = FirebaseRepository.getInstance(application.getApplicationContext());
+        FirebaseRepository firebaseRepository = FirebaseRepository.getInstance();
         isUserSignedIn = firebaseRepository.isUserSignedIn();
     }
 

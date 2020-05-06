@@ -78,7 +78,7 @@ public class RegisterFragment extends Fragment {
                 progressDialog.setMessage("Please wait...");
                 progressDialog.show();
 
-                FirebaseRepository firebaseRepository = FirebaseRepository.getInstance(getContext());
+                FirebaseRepository firebaseRepository = FirebaseRepository.getInstance();
                 FirebaseAuth auth = firebaseRepository.getFirebaseAuth();
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(getActivity(), task -> {
                     if (task.isSuccessful()) {

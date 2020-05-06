@@ -25,8 +25,8 @@ public class SearchableViewModel extends AndroidViewModel {
 
     public SearchableViewModel(@NonNull Application application) {
         super(application);
-        movieRepository = MovieRepository.getInstance(application.getApplicationContext());
-        actorsRepository = ActorsRepository.getInstance(application.getApplicationContext());
+        movieRepository = MovieRepository.getInstance();
+        actorsRepository = ActorsRepository.getInstance();
         handler = new Handler(Looper.getMainLooper());
     }
 

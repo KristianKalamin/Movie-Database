@@ -20,7 +20,7 @@ public class FavoriteMoviesViewModel extends AndroidViewModel {
 
     public FavoriteMoviesViewModel(@NonNull Application application) {
         super(application);
-        firebaseRepository = FirebaseRepository.getInstance(getApplication().getApplicationContext());
+        firebaseRepository = FirebaseRepository.getInstance();
         handler = new Handler(Looper.getMainLooper());
     }
 

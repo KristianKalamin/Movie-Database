@@ -1,7 +1,6 @@
 package com.kalamin.moviedatabase.repository;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
@@ -11,6 +10,7 @@ import com.kalamin.moviedatabase.model.entity.ActorDetails;
 import com.kalamin.moviedatabase.model.remote.MoviesRestService;
 import com.kalamin.moviedatabase.utils.Reader;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.DateFormat;
@@ -28,14 +28,14 @@ public class ActorsRepository {
     private static ActorsRepository instance;
     private Reader reader;
 
-    public synchronized static ActorsRepository getInstance(Context applicationContext) {
+    public synchronized static ActorsRepository getInstance() {
         if (instance == null)
-            instance = new ActorsRepository(applicationContext);
+            instance = new ActorsRepository();
         return instance;
     }
 
-    private ActorsRepository(Context applicationContext) {
-        this.reader = Reader.getInstance(applicationContext);
+    private ActorsRepository() {
+        this.reader = Reader.getInstance();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -112,6 +112,7 @@ public class ActorsRepository {
         return new Actor(actorId, name, imagePath);
     }
 
+    @NotNull
     private List<String> getImages(String actorId) throws ExecutionException, InterruptedException {
         String jsonResult = new MoviesRestService().execute(this.reader.getActorImagesEndPoint(actorId)).get();
         List<String> images = new ArrayList<>();
@@ -123,10 +124,17 @@ public class ActorsRepository {
     }
 
     public List<Actor> getActors(String movieId) {
-        List<Actor> actorList = new ArrayList<>(3);
+        List<Actor> actorList = new ArrayList<>(10);
         try {
             String jsonResult = new MoviesRestService().execute(this.reader.getCreditsEndPoint(movieId)).get();
+
+            Integer statusCode = JsonPath.using((Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS))).parse(jsonResult).read("status_code");
+            if (statusCode != null)
+                return null;
+
             ArrayList<HashMap<String, Object>> credits = JsonPath.read(jsonResult, "$.cast");
+            if (credits == null)
+                return null;
 
             for (int i = 0; i < credits.size(); i++) {
                 String posterPath = (String) credits.get(i).get("profile_path");

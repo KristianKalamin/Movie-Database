@@ -3,10 +3,13 @@ package com.kalamin.moviedatabase.views.activities;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -22,6 +25,12 @@ import com.kalamin.moviedatabase.views.fragments.NavigationHost;
 public abstract class BaseActivity extends AppCompatActivity implements NavigationHost {
     public DrawerLayout drawer;
     private InternetConnectionReceiver internetConnectionReceiver;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.getWindow().setNavigationBarColor(Color.parseColor("#303030"));
+    }
 
     @SuppressWarnings("ConstantConditions")
     public void setToolbarWithBackButton() {

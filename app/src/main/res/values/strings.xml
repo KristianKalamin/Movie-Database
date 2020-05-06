@@ -22,4 +22,5 @@
 
     <string name="you_haven_t_added_any_movie_to_your_favorite_movies_list">You haven\'t added any movie to your favorite movies list</string>
     <string name="no_available_images">No available images</string>
+    <string name="details_for_this_movie_are_currently_not_available">Details for this movie are currently not available</string>
 </resources>

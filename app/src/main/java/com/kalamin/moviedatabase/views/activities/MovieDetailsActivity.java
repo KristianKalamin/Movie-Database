@@ -27,6 +27,7 @@ public class MovieDetailsActivity extends BaseActivity {
     private TextView txtAverageVote;
     private TextView txtPopularity;
     private TextView txtReleaseDate;
+    private TextView movieDetailsNotFound;
     private ImageView imageView;
     private Button btnAddToFavorite;
     private ProgressBar progressBar;
@@ -55,6 +56,7 @@ public class MovieDetailsActivity extends BaseActivity {
         imageView = findViewById(R.id.poster);
         btnAddToFavorite = findViewById(R.id.btnAddToFavorite);
         progressBar = findViewById(R.id.progressBar);
+        movieDetailsNotFound = findViewById(R.id.movie_details_not_found);
 
         Intent intent = getIntent();
         String movieId = intent.getStringExtra(Extra.MOVIE_ID);
@@ -110,6 +112,9 @@ public class MovieDetailsActivity extends BaseActivity {
                 txtReleaseDate.setText(md.getReleaseDate());
                 Picasso.get().load(md.getPosterPath()).fit().centerCrop().into(imageView);
                 movieDetailsViewModel.getMovieObservable().removeObserver(movieDetailsObserver);
+            } else {
+                progressBar.setVisibility(View.GONE);
+                movieDetailsNotFound.setVisibility(View.VISIBLE);
             }
         }
     };
@@ -120,5 +125,4 @@ public class MovieDetailsActivity extends BaseActivity {
         movieDetailsViewModel.stopObserver();
         super.onDestroy();
     }
-
 }

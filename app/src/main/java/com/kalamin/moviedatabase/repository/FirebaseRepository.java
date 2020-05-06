@@ -1,7 +1,5 @@
 package com.kalamin.moviedatabase.repository;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -28,14 +26,14 @@ public class FirebaseRepository {
     private User currentUser;
     private FirebaseDB firebaseDB;
 
-    public synchronized static FirebaseRepository getInstance(Context context) {
+    public synchronized static FirebaseRepository getInstance() {
         if (instance == null)
-            instance = new FirebaseRepository(context);
+            instance = new FirebaseRepository();
         return instance;
     }
 
-    private FirebaseRepository(Context context) {
-        firebaseListener = FirebaseListener.getInstance(context);
+    private FirebaseRepository() {
+        firebaseListener = FirebaseListener.getInstance();
         firebaseDB = new FirebaseDB();
     }
 

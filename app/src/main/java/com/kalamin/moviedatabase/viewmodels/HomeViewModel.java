@@ -22,9 +22,9 @@ public class HomeViewModel extends AndroidViewModel {
     public HomeViewModel(@NonNull Application application) {
         super(application);
         Handler handler = new Handler(application.getMainLooper());
-        MovieRepository movieRepository = MovieRepository.getInstance(application.getApplicationContext());
+        MovieRepository movieRepository = MovieRepository.getInstance();
         discoveredMovies = new MutableLiveData<>();
-        firebaseRepository = FirebaseRepository.getInstance(application.getApplicationContext());
+        firebaseRepository = FirebaseRepository.getInstance();
 
         handler.postDelayed(() -> {
             try {

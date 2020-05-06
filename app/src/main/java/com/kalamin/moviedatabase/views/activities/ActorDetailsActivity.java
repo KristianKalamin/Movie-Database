@@ -85,6 +85,4 @@ public class ActorDetailsActivity extends BaseActivity {
             findViewById(R.id.progressBar).setVisibility(View.GONE);
         }
     };
-
-
 }

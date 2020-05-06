@@ -1,7 +1,6 @@
 package com.kalamin.moviedatabase.utils;
 
-import android.content.Context;
-
+import com.kalamin.moviedatabase.MovieDatabase;
 import com.kalamin.moviedatabase.R;
 
 import org.jetbrains.annotations.NotNull;
@@ -23,22 +22,20 @@ public final class Reader {
     private String searchActorsEndPoint;
 
     private static Reader reader = null;
-    private Context appContext;
 
-    public static Reader getInstance(Context applicationContext) {
+    public static Reader getInstance() {
         if (reader == null)
-            reader = new Reader(applicationContext);
+            reader = new Reader();
         return reader;
     }
 
-    private Reader(Context applicationContext) {
-        this.appContext = applicationContext;
+    private Reader() {
         jsonKeys(parseJson());
     }
 
     @NotNull
     private String parseJson() {
-        InputStream inputStream = this.appContext.getResources().openRawResource(R.raw.movie_api);
+        InputStream inputStream = MovieDatabase.applicationContext.getResources().openRawResource(R.raw.movie_api);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         int ctr;
@@ -111,5 +108,4 @@ public final class Reader {
     public String getDiscoverMoviesEndPoint(int pageNum) {
         return this.discoverMoviesEndPoint.replace("{NUM}", String.valueOf(pageNum));
     }
-
 }

@@ -16,8 +16,6 @@ import com.kalamin.moviedatabase.views.activities.HomeActivity;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-
 public class EnterAppFragment extends Fragment {
     private static int parentActivityId;
 
@@ -39,12 +37,12 @@ public class EnterAppFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        view.findViewById(R.id.btnLogin).setOnClickListener(v -> ((NavigationHost) Objects.requireNonNull(getActivity())).navigateTo(parentActivityId, LoginFragment.newInstance(), true));
+        view.findViewById(R.id.btnLogin).setOnClickListener(v -> ((NavigationHost) requireActivity()).navigateTo(parentActivityId, LoginFragment.newInstance(), true));
 
-        view.findViewById(R.id.btnRegister).setOnClickListener(v -> ((NavigationHost) Objects.requireNonNull(getActivity())).navigateTo(parentActivityId, RegisterFragment.newInstance(), true));
+        view.findViewById(R.id.btnRegister).setOnClickListener(v -> ((NavigationHost) requireActivity()).navigateTo(parentActivityId, RegisterFragment.newInstance(), true));
 
         view.findViewById(R.id.btnNotNow).setOnClickListener(v -> {
-            Objects.requireNonNull(getActivity()).finish();
+            requireActivity().finish();
             startActivity(new Intent(getActivity(), HomeActivity.class));
         });
     }
