@@ -21,10 +21,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MovieRepository {
     private static MovieRepository instance;
     private Reader reader;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private MoviesRestService restService;
 
     public synchronized static MovieRepository getInstance() {
         if (instance == null)
@@ -34,17 +38,20 @@ public class MovieRepository {
 
     private MovieRepository() {
         this.reader = Reader.getInstance();
+        restService = new MoviesRestService();
     }
 
     public List<Movie> discoverMovies() throws ExecutionException, InterruptedException {
-        String jsonResult = new MoviesRestService().execute(this.reader.getDiscoverMoviesEndPoint(1)).get();
+        restService.setEndPointURL(this.reader.getDiscoverMoviesEndPoint(1));
+        String jsonResult = executor.submit(restService).get();
 
         return readJson(jsonResult);
     }
 
     public Movie getMovie(@NotNull String id) {
         try {
-            String jsonResult = new MoviesRestService().execute(this.reader.getMovieDetailsEndPoint(id)).get();
+            restService.setEndPointURL(this.reader.getMovieDetailsEndPoint(id));
+            String jsonResult = executor.submit(restService).get();
             Object document = Configuration.defaultConfiguration()
                     .addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL)
                     .jsonProvider()
@@ -60,7 +67,8 @@ public class MovieRepository {
     @SuppressLint("SimpleDateFormat")
     public MovieDetails getMovieDetails(String id) {
         try {
-            String jsonResult = new MoviesRestService().execute(this.reader.getMovieDetailsEndPoint(id)).get();
+            restService.setEndPointURL(this.reader.getMovieDetailsEndPoint(id));
+            String jsonResult = executor.submit(restService).get();
             Object document = Configuration.defaultConfiguration()
                     .addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL)
                     .jsonProvider()
@@ -96,7 +104,8 @@ public class MovieRepository {
     }
 
     public List<Movie> searchMovies(String movieName) throws ExecutionException, InterruptedException {
-        String jsonResult = new MoviesRestService().execute(this.reader.getSearchMovieEndPoint(movieName)).get();
+        restService.setEndPointURL(this.reader.getSearchMovieEndPoint(movieName));
+        String jsonResult = executor.submit(restService).get();
 
         return readJson(jsonResult);
     }
@@ -128,5 +137,11 @@ public class MovieRepository {
         double averageVote = ((Number) ((JsonPath.read(document, "$['vote_average']") == null) ? 0 : JsonPath.read(document, "$['vote_average']"))).doubleValue();
 
         return new Movie(String.valueOf(movieId), title, posterPath, averageVote);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        executor.shutdown();
+        super.finalize();
     }
 }

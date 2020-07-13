@@ -1,32 +1,22 @@
 package com.kalamin.moviedatabase.model.remote;
 
-import android.os.AsyncTask;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MoviesRestService extends AsyncTask<String, Void, String> {
+public class MoviesRestService implements Callable<String> {
 
     private OkHttpClient client;
+    private String url;
 
     public MoviesRestService() {
         client = new OkHttpClient();
-    }
-
-    @Override
-    protected String doInBackground(@NotNull String... strings) {
-        try {
-            return callRest(strings[0]);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @NotNull
@@ -38,5 +28,14 @@ public class MoviesRestService extends AsyncTask<String, Void, String> {
         try (Response response = client.newCall(request).execute()) {
             return Objects.requireNonNull(response.body()).string();
         }
+    }
+
+    public void setEndPointURL(String url) {
+        this.url = url;
+    }
+
+    @Override
+    public String call() throws Exception {
+        return callRest(this.url);
     }
 }

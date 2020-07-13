@@ -63,7 +63,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         super.onDestroy();
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();

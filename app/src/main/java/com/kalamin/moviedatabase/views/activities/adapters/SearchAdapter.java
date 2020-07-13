@@ -60,7 +60,7 @@ public class SearchAdapter implements ListAdapter {
 
     @Override
     public long getItemId(int position) {
-        return Long.valueOf(frames.get(position).getId());
+        return Long.parseLong(frames.get(position).getId());
     }
 
     @Override

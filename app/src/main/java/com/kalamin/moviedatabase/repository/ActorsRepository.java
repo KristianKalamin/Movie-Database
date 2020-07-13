@@ -23,10 +23,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ActorsRepository {
     private static ActorsRepository instance;
     private Reader reader;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private MoviesRestService restService;
 
     public synchronized static ActorsRepository getInstance() {
         if (instance == null)
@@ -36,13 +40,15 @@ public class ActorsRepository {
 
     private ActorsRepository() {
         this.reader = Reader.getInstance();
+        restService = new MoviesRestService();
     }
 
     @SuppressWarnings("ConstantConditions")
     @SuppressLint("SimpleDateFormat")
     public ActorDetails getActorDetails(String id) {
         try {
-            String jsonResult = new MoviesRestService().execute(this.reader.getActorEndPoint(id)).get();
+            restService.setEndPointURL(this.reader.getActorEndPoint(id));
+            String jsonResult = executor.submit(restService).get();
             Object document = Configuration.defaultConfiguration()
                     .addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL)
                     .jsonProvider()
@@ -84,7 +90,8 @@ public class ActorsRepository {
     public List<Actor> searchActors(String actorName) {
         List<Actor> searchResult = new ArrayList<>();
         try {
-            String jsonResult = new MoviesRestService().execute(this.reader.getSearchActorsEndPoint(actorName)).get();
+            restService.setEndPointURL(this.reader.getSearchActorsEndPoint(actorName));
+            String jsonResult = executor.submit(restService).get();
             ArrayList<HashMap<String, Object>> actors = JsonPath.read(jsonResult, "$.results");
 
             for (int i = 0; i < actors.size(); i++) {
@@ -102,7 +109,8 @@ public class ActorsRepository {
 
     @Nullable
     private Actor getActor(String actorId) throws ExecutionException, InterruptedException {
-        String jsonResult = new MoviesRestService().execute(this.reader.getActorEndPoint(actorId)).get();
+        restService.setEndPointURL(this.reader.getActorEndPoint(actorId));
+        String jsonResult = executor.submit(restService).get();
 
         String imagePath = (String) JsonPath.read(jsonResult, "$['profile_path']");
         if (imagePath == null) return null;
@@ -114,7 +122,8 @@ public class ActorsRepository {
 
     @NotNull
     private List<String> getImages(String actorId) throws ExecutionException, InterruptedException {
-        String jsonResult = new MoviesRestService().execute(this.reader.getActorImagesEndPoint(actorId)).get();
+        restService.setEndPointURL(this.reader.getActorImagesEndPoint(actorId));
+        String jsonResult = executor.submit(restService).get();
         List<String> images = new ArrayList<>();
         ArrayList<HashMap<String, Object>> imagePaths = JsonPath.read(jsonResult, "$.profiles");
         for (int i = 0; i < imagePaths.size(); i++) {
@@ -126,7 +135,8 @@ public class ActorsRepository {
     public List<Actor> getActors(String movieId) {
         List<Actor> actorList = new ArrayList<>(10);
         try {
-            String jsonResult = new MoviesRestService().execute(this.reader.getCreditsEndPoint(movieId)).get();
+            restService.setEndPointURL(this.reader.getCreditsEndPoint(movieId));
+            String jsonResult = executor.submit(restService).get();
 
             Integer statusCode = JsonPath.using((Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS))).parse(jsonResult).read("status_code");
             if (statusCode != null)
@@ -149,5 +159,11 @@ public class ActorsRepository {
             e.printStackTrace();
         }
         return actorList;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        executor.shutdown();
+        super.finalize();
     }
 }
