@@ -59,20 +59,22 @@ public class ActorsRepository {
 
             DateFormat localFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
             SimpleDateFormat restDateFormat = new SimpleDateFormat("YYYY-mm-dd");
-            Date date = restDateFormat.parse((String) (JsonPath.read(document, "$['birthday']")));
-
-            Date today = Calendar.getInstance().getTime();
-            long diff = Math.abs(today.getTime() - date.getTime());
-
-            String age = Long.toString(diff / 31556952000L);
-
-            String birthday = localFormat.format(date);
+            Date birthdayDate = restDateFormat.parse((String) (JsonPath.read(document, "$['birthday']")));
+            String birthday = localFormat.format(birthdayDate);
 
             String deathday = JsonPath.read(document, "$['deathday']");
+            String age = "";
             if (deathday != null) {
-                date = restDateFormat.parse(deathday);
-                assert date != null;
-                deathday = localFormat.format(date);
+                Date deathDate = restDateFormat.parse(deathday);
+                assert deathDate != null;
+
+                deathday = localFormat.format(deathDate);
+                long diff = Math.abs(deathDate.getTime() - birthdayDate.getTime());
+                age = Long.toString(diff / 31556952000L);
+            } else {
+                Date today = Calendar.getInstance().getTime();
+                long diff = Math.abs(today.getTime() - birthdayDate.getTime());
+                age = Long.toString(diff / 31556952000L);
             }
 
             String name = JsonPath.read(document, "$['name']");
