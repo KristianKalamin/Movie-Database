@@ -7,6 +7,9 @@ public abstract class Frame {
     private String name;
     private String posterPath;
 
+    public Frame() {
+    }
+
     Frame(String id, String name, String posterPath) {
         this.id = id;
         this.name = name;

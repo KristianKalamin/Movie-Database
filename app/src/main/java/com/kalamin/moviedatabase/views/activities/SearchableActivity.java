@@ -18,6 +18,7 @@ import static androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CU
 
 public class SearchableActivity extends BaseActivity {
     private SearchableViewModel searchableViewModel;
+    private SearchResultsPageAdapter searchResultsPageAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +36,8 @@ public class SearchableActivity extends BaseActivity {
         searchableViewModel = new ViewModelProvider(this).get(SearchableViewModel.class);
         ViewPager viewPager = findViewById(R.id.pager);
         TabLayout tabLayout = findViewById(R.id.tabs);
-        SearchResultsPageAdapter searchResultsPageAdapter = new SearchResultsPageAdapter(getSupportFragmentManager(), BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        searchResultsPageAdapter = new SearchResultsPageAdapter(getSupportFragmentManager(),
+                BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
         viewPager.setAdapter(searchResultsPageAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -54,6 +56,7 @@ public class SearchableActivity extends BaseActivity {
             String query = intent.getStringExtra(SearchManager.QUERY);
             setTitle(query);
             searchableViewModel.search(query);
+            searchResultsPageAdapter.notifyDataSetChanged();
         }
     }
 }

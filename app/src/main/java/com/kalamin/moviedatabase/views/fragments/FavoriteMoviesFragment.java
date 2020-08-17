@@ -25,8 +25,6 @@ import com.kalamin.moviedatabase.views.activities.adapters.MovieAdapter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-
 public class FavoriteMoviesFragment extends Fragment {
     private static final int SHOW_MOVIE_DETAILS = 1;
     private FavoriteMoviesViewModel favoriteMoviesViewModel;
@@ -79,14 +77,14 @@ public class FavoriteMoviesFragment extends Fragment {
         super.onStart();
 
         favoriteMoviesViewModel = new ViewModelProvider(this).get(FavoriteMoviesViewModel.class);
-        favoriteMoviesViewModel.getFavoriteMovies().observeForever(stringMovieMap -> {
+        favoriteMoviesViewModel.getFavoriteMovies().observe(getViewLifecycleOwner(), movies -> {
             progressBar.setVisibility(View.GONE);
-            if (stringMovieMap.size() == 0)
+            if (movies.size() == 0)
                 msg.setVisibility(View.VISIBLE);
             else {
                 msg.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
-                adapter.submitList(new ArrayList<>(stringMovieMap.values()));
+                adapter.submitList(movies);
             }
         });
 
@@ -101,11 +99,5 @@ public class FavoriteMoviesFragment extends Fragment {
                 favoriteMoviesViewModel.deleteFavoriteMovie(adapter.getMovieAt(viewHolder.getAdapterPosition()));
             }
         }).attachToRecyclerView(recyclerView);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        favoriteMoviesViewModel.getFavoriteMovies().removeObservers(this);
     }
 }

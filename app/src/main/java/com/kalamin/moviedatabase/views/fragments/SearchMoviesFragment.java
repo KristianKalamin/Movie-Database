@@ -21,7 +21,6 @@ import com.kalamin.moviedatabase.viewmodels.SearchableViewModel;
 import com.kalamin.moviedatabase.views.activities.MovieDetailsActivity;
 import com.kalamin.moviedatabase.views.activities.adapters.SearchAdapter;
 
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -30,14 +29,13 @@ public class SearchMoviesFragment extends Fragment {
     private ProgressBar progressBar;
     private ListView listView;
     private TextView textView;
-    private SearchableViewModel searchableViewModel;
+    private SearchAdapter searchAdapter;
 
     public SearchMoviesFragment() {
         // Required empty public constructor
     }
 
     @NotNull
-    @Contract(" -> new")
     public static SearchMoviesFragment newInstance() {
         return new SearchMoviesFragment();
     }
@@ -49,37 +47,33 @@ public class SearchMoviesFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_search_movies, container, false);
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         progressBar = view.findViewById(R.id.progress_bar);
         listView = view.findViewById(R.id.list_view);
         textView = view.findViewById(R.id.movie_not_found);
 
-        searchableViewModel = new ViewModelProvider(getActivity()).get(SearchableViewModel.class);
-        searchableViewModel.getMovies().observeForever(movieObserver);
+        searchAdapter = new SearchAdapter(getContext(), MovieDetailsActivity.class);
+        SearchableViewModel searchableViewModel = new ViewModelProvider(getActivity()).get(SearchableViewModel.class);
+        searchableViewModel.getMovies().observe(getViewLifecycleOwner(), movieObserver);
     }
 
     @SuppressLint("SetTextI18n")
     private Observer<List<Movie>> movieObserver = movies -> {
-        if (movies.size() > 0) {
-            SearchAdapter searchAdapter = new SearchAdapter(getContext(), movies, MovieDetailsActivity.class);
-            listView.setAdapter(searchAdapter);
-            progressBar.setVisibility(View.GONE);
-            textView.setVisibility(View.GONE);
-            listView.setVisibility(View.VISIBLE);
-        } else {
-            listView.setAdapter(null);
-            textView.setText("Movie not found");
-            progressBar.setVisibility(View.GONE);
-            textView.setVisibility(View.VISIBLE);
-            listView.setVisibility(View.GONE);
+        if (movies != null) {
+            if (movies.size() > 0) {
+                searchAdapter.setFrames(movies);
+                listView.setAdapter(searchAdapter);
+                progressBar.setVisibility(View.GONE);
+                textView.setVisibility(View.GONE);
+                listView.setVisibility(View.VISIBLE);
+            } else {
+                listView.setAdapter(null);
+                textView.setText("Movie not found");
+                progressBar.setVisibility(View.GONE);
+                textView.setVisibility(View.VISIBLE);
+                listView.setVisibility(View.GONE);
+            }
         }
     };
-
-    @Override
-    public void onDestroyView() {
-        searchableViewModel.getMovies().removeObserver(movieObserver);
-        super.onDestroyView();
-    }
 }

@@ -22,10 +22,13 @@ public class SearchAdapter implements ListAdapter {
     private List<? extends Frame> frames;
     private Class<?> destinationActivity;
 
-    public SearchAdapter(Context context, List<? extends Frame> frames, Class<?> destinationActivity) {
+    public SearchAdapter(Context context, Class<?> destinationActivity) {
         this.context = context;
-        this.frames = frames;
         this.destinationActivity = destinationActivity;
+    }
+
+    public void setFrames(List<? extends Frame> frames) {
+        this.frames = frames;
     }
 
     @Override

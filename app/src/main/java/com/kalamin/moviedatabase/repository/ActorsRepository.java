@@ -2,6 +2,9 @@ package com.kalamin.moviedatabase.repository;
 
 import android.annotation.SuppressLint;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
@@ -45,7 +48,7 @@ public class ActorsRepository {
 
     @SuppressWarnings("ConstantConditions")
     @SuppressLint("SimpleDateFormat")
-    public ActorDetails getActorDetails(String id) {
+    public LiveData<ActorDetails> getActorDetails(String id) {
         try {
             restService.setEndPointURL(this.reader.getActorEndPoint(id));
             String jsonResult = executor.submit(restService).get();
@@ -80,14 +83,14 @@ public class ActorsRepository {
 
             double popularity = ((Number) ((JsonPath.read(document, "$['popularity']") == null) ? 0 : JsonPath.read(document, "$['popularity']"))).doubleValue();
 
-            return new ActorDetails(name, birthday, deathday, bio, placeOfBirth, imagePath, popularity, age, getImages(id));
+            return new MutableLiveData<>(new ActorDetails(name, birthday, deathday, bio, placeOfBirth, imagePath, popularity, age, getImages(id)));
         } catch (ExecutionException | InterruptedException | ParseException e) {
             e.printStackTrace();
         }
-        return null;
+        return new MutableLiveData<>(new ActorDetails());
     }
 
-    public List<Actor> searchActors(String actorName) {
+    public LiveData<List<Actor>> searchActors(String actorName) {
         List<Actor> searchResult = new ArrayList<>();
         try {
             restService.setEndPointURL(this.reader.getSearchActorsEndPoint(actorName));
@@ -104,7 +107,7 @@ public class ActorsRepository {
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
-        return searchResult;
+        return new MutableLiveData<>(searchResult);
     }
 
     @Nullable
@@ -132,7 +135,7 @@ public class ActorsRepository {
         return images;
     }
 
-    public List<Actor> getActors(String movieId) {
+    public LiveData<List<Actor>> getActors(String movieId) {
         List<Actor> actorList = new ArrayList<>(10);
         try {
             restService.setEndPointURL(this.reader.getCreditsEndPoint(movieId));
@@ -158,7 +161,7 @@ public class ActorsRepository {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        return actorList;
+        return new MutableLiveData<>(actorList);
     }
 
     @Override

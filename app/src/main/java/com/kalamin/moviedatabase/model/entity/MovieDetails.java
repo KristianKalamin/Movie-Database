@@ -16,6 +16,9 @@ public class MovieDetails implements Parcelable {
     private int runtime;
     private double popularity;
 
+    public MovieDetails() {
+    }
+
     public MovieDetails(int id,
                         String title,
                         String overview,

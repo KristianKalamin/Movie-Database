@@ -15,6 +15,9 @@ public class ActorDetails {
     private String age;
     private List<String> images;
 
+    public ActorDetails() {
+    }
+
     public ActorDetails(String name, String birthday, String deathday, String bio, String placeOfBirth, String imagePath, double popularity, String age, List<String> images) {
         this.name = name;
         this.birthday = birthday;

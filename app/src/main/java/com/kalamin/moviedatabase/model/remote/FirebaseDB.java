@@ -9,9 +9,6 @@ import com.kalamin.moviedatabase.utils.Hash;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-import java.util.Objects;
-
 @SuppressWarnings("ConstantConditions")
 public class FirebaseDB {
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -38,11 +35,10 @@ public class FirebaseDB {
                 .setValue(movieDetailsId);
     }
 
-    public void removeFavoriteMovie(@NotNull Movie movie, Map<String, Movie> favoriteMoviesMap, String userId) {
-        String key = findKey(favoriteMoviesMap, movie);
+    public void removeFavoriteMovie(@NotNull Movie movie, String userId) {
         databaseFavoriteMoviesReference
                 .child(userId)
-                .child(key)
+                .child(movie.getFirebaseId())
                 .removeValue();
     }
 
@@ -57,16 +53,6 @@ public class FirebaseDB {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
         firebaseUser.updatePassword(password);
         databaseUserReference.child(userId).child("password").setValue(Hash.password(password));
-    }
-
-
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
-    @NotNull
-    private String findKey(@NotNull Map<String, Movie> map, Movie movie) {
-        return map.entrySet()
-                .stream()
-                .filter(entry -> Objects.equals(entry.getValue(), movie))
-                .map(Map.Entry::getKey).findFirst().get();
     }
 
     public FirebaseAuth getFirebaseAuth() {

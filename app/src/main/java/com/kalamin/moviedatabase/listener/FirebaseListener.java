@@ -11,13 +11,14 @@ import com.kalamin.moviedatabase.model.entity.Movie;
 import com.kalamin.moviedatabase.repository.FirebaseRepository;
 import com.kalamin.moviedatabase.repository.MovieRepository;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class FirebaseListener {
     private MovieRepository movieRepository;
     private static FirebaseListener firebaseListener = null;
-    public static MutableLiveData<Map<String, Movie>> favoriteMoviesLiveData;
+    public static MutableLiveData<List<Movie>> favoriteMoviesLiveData;
     private DatabaseReference reference;
 
     public synchronized static FirebaseListener getInstance() {
@@ -45,14 +46,16 @@ public class FirebaseListener {
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
             Map<String, String> map = (Map<String, String>) dataSnapshot.getValue();
             if (map != null) {
-                Map<String, Movie> idMovieMap = new HashMap<>(map.size());
+                List<Movie> favMovies = new ArrayList<>(map.size());
 
                 for (Map.Entry<String, String> entry : map.entrySet()) {
-                    idMovieMap.put(entry.getKey(), movieRepository.getMovie(entry.getValue()));
+                    Movie movie = movieRepository.getMovie(entry.getValue()).getValue();
+                    movie.setFirebaseId(entry.getKey());
+                    favMovies.add(movie);
                 }
-                favoriteMoviesLiveData.postValue(idMovieMap);
+                favoriteMoviesLiveData.postValue(favMovies);
             } else {
-                favoriteMoviesLiveData.postValue(new HashMap<String, Movie>());
+                favoriteMoviesLiveData.postValue(new ArrayList<>());
             }
         }
 

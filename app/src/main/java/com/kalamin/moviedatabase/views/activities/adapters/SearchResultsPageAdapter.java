@@ -15,7 +15,7 @@ public class SearchResultsPageAdapter extends FragmentStatePagerAdapter {
     private static final CharSequence[] tabNames = {"Movies", "Actors"};
 
     public SearchResultsPageAdapter(@NonNull FragmentManager fm, int behavior) {
-        super(fm, behavior);
+        super(fm, behavior);;
     }
 
     @NotNull
@@ -28,6 +28,11 @@ public class SearchResultsPageAdapter extends FragmentStatePagerAdapter {
                 return SearchActorsFragment.newInstance();
         }
         return null;
+    }
+
+    @Override
+    public int getItemPosition(@NonNull Object object) {
+        return POSITION_NONE;
     }
 
     @Override

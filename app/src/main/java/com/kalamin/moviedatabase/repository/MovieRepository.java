@@ -2,6 +2,9 @@ package com.kalamin.moviedatabase.repository;
 
 import android.annotation.SuppressLint;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
@@ -41,14 +44,14 @@ public class MovieRepository {
         restService = new MoviesRestService();
     }
 
-    public List<Movie> discoverMovies() throws ExecutionException, InterruptedException {
+    public LiveData<List<Movie>> discoverMovies() throws ExecutionException, InterruptedException {
         restService.setEndPointURL(this.reader.getDiscoverMoviesEndPoint(1));
         String jsonResult = executor.submit(restService).get();
 
-        return readJson(jsonResult);
+        return new MutableLiveData<>(readJson(jsonResult));
     }
 
-    public Movie getMovie(@NotNull String id) {
+    public LiveData<Movie> getMovie(@NotNull String id) {
         try {
             restService.setEndPointURL(this.reader.getMovieDetailsEndPoint(id));
             String jsonResult = executor.submit(restService).get();
@@ -57,15 +60,15 @@ public class MovieRepository {
                     .jsonProvider()
                     .parse(jsonResult);
 
-            return readJson(document);
+            return new MutableLiveData<>(readJson(document));
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
-        return null;
+        return new MutableLiveData<>(new Movie());
     }
 
     @SuppressLint("SimpleDateFormat")
-    public MovieDetails getMovieDetails(String id) {
+    public LiveData<MovieDetails> getMovieDetails(String id) {
         try {
             restService.setEndPointURL(this.reader.getMovieDetailsEndPoint(id));
             String jsonResult = executor.submit(restService).get();
@@ -95,19 +98,19 @@ public class MovieRepository {
             int runtime = (int) ((JsonPath.read(document, "$['runtime']") == null) ? 0 : JsonPath.read(document, "$['runtime']"));
 
             double popularity = ((Number) ((JsonPath.read(document, "$['popularity']") == null) ? 0 : JsonPath.read(document, "$['popularity']"))).doubleValue();
-            return new MovieDetails(movieId, title, overview, posterPath, releaseDate, averageVote, runtime, popularity);
+            return new MutableLiveData<>(new MovieDetails(movieId, title, overview, posterPath, releaseDate, averageVote, runtime, popularity));
 
         } catch (InterruptedException | ExecutionException | ParseException e) {
             e.printStackTrace();
         }
-        return null;
+        return new MutableLiveData<>(new MovieDetails());
     }
 
-    public List<Movie> searchMovies(String movieName) throws ExecutionException, InterruptedException {
+    public LiveData<List<Movie>> searchMovies(String movieName) throws ExecutionException, InterruptedException {
         restService.setEndPointURL(this.reader.getSearchMovieEndPoint(movieName));
         String jsonResult = executor.submit(restService).get();
 
-        return readJson(jsonResult);
+        return new MutableLiveData<>(readJson(jsonResult));
     }
 
     @NotNull

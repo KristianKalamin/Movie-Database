@@ -21,23 +21,21 @@ import com.kalamin.moviedatabase.viewmodels.SearchableViewModel;
 import com.kalamin.moviedatabase.views.activities.ActorDetailsActivity;
 import com.kalamin.moviedatabase.views.activities.adapters.SearchAdapter;
 
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class SearchActorsFragment extends Fragment {
-    private SearchableViewModel searchableViewModel;
     private ProgressBar progressBar;
     private ListView listView;
     private TextView textView;
+    private SearchAdapter searchAdapter;
 
     public SearchActorsFragment() {
         // Required empty public constructor
     }
 
     @NotNull
-    @Contract(" -> new")
     public static SearchActorsFragment newInstance() {
         return new SearchActorsFragment();
     }
@@ -49,38 +47,33 @@ public class SearchActorsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_search_actors, container, false);
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         progressBar = view.findViewById(R.id.progress_bar);
         listView = view.findViewById(R.id.list_view);
         textView = view.findViewById(R.id.actor_not_found);
 
-        searchableViewModel = new ViewModelProvider(getActivity()).get(SearchableViewModel.class);
-
-        searchableViewModel.getActors().observeForever(actorObserver);
+        searchAdapter = new SearchAdapter(getContext(), ActorDetailsActivity.class);
+        SearchableViewModel searchableViewModel = new ViewModelProvider(getActivity()).get(SearchableViewModel.class);
+        searchableViewModel.getActors().observe(getViewLifecycleOwner(), actorObserver);
     }
 
     @SuppressLint("SetTextI18n")
     private Observer<List<Actor>> actorObserver = actors -> {
-        if (actors.size() > 0) {
-            SearchAdapter searchAdapter = new SearchAdapter(getContext(), actors, ActorDetailsActivity.class);
-            listView.setAdapter(searchAdapter);
-            progressBar.setVisibility(View.GONE);
-            textView.setVisibility(View.GONE);
-            listView.setVisibility(View.VISIBLE);
-        } else {
-            listView.setAdapter(null);
-            textView.setText("Actor not found");
-            progressBar.setVisibility(View.GONE);
-            textView.setVisibility(View.VISIBLE);
-            listView.setVisibility(View.GONE);
+        if (actors != null) {
+            if (actors.size() > 0) {
+                searchAdapter.setFrames(actors);
+                listView.setAdapter(searchAdapter);
+                progressBar.setVisibility(View.GONE);
+                textView.setVisibility(View.GONE);
+                listView.setVisibility(View.VISIBLE);
+            } else {
+                listView.setAdapter(null);
+                textView.setText("Actor not found");
+                progressBar.setVisibility(View.GONE);
+                textView.setVisibility(View.VISIBLE);
+                listView.setVisibility(View.GONE);
+            }
         }
     };
-
-    @Override
-    public void onDestroyView() {
-        searchableViewModel.getActors().removeObserver(actorObserver);
-        super.onDestroyView();
-    }
 }

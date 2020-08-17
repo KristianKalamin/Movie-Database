@@ -33,6 +33,9 @@ public class ActorsFragment extends Fragment {
     private TextView topCast;
     private RecyclerView recyclerView;
 
+    public ActorsFragment() {
+    }
+
     @NotNull
     @Contract(" -> new")
     public static ActorsFragment newInstance() {
@@ -47,8 +50,7 @@ public class ActorsFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        actorsViewModel = new ViewModelProvider(this).get(ActorsViewModel.class);
+        actorsViewModel = new ViewModelProvider(getActivity()).get(ActorsViewModel.class);
         recyclerView = view.findViewById(R.id.actors_list_recycler_view);
         topCast = view.findViewById(R.id.txt_top_cast);
 
@@ -88,12 +90,6 @@ public class ActorsFragment extends Fragment {
         if (movieId == null)
             movieId = getActivity().getIntent().getStringExtra(Extra.SEARCH_ITEM_ID);
         actorsViewModel.askForActors(movieId);
-        actorsViewModel.getActors().observeForever(actorObserver);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        actorsViewModel.getActors().removeObserver(actorObserver);
+        actorsViewModel.getActors().observe(getViewLifecycleOwner(), actorObserver);
     }
 }

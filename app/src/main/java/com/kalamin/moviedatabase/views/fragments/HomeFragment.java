@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public class HomeFragment extends Fragment {
-    private HomeViewModel homeViewModel;
     private MovieAdapter adapter;
     private ProgressBar progressBar;
 
@@ -57,12 +56,15 @@ public class HomeFragment extends Fragment {
 
         adapter = new MovieAdapter("card");
         recyclerView.setAdapter(adapter);
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        HomeViewModel homeViewModel = new ViewModelProvider(getActivity()).get(HomeViewModel.class);
 
-        homeViewModel.getDiscoveredMovies().observeForever(movies -> {
-            adapter.submitList(movies);
-            progressBar.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
+        homeViewModel.getDiscoveredMovies().observe(getViewLifecycleOwner(), movies -> {
+            if (movies != null) {
+                adapter.submitList(movies);
+                progressBar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+
         });
 
         adapter.setOnItemClickListener(movie -> {
@@ -71,11 +73,5 @@ public class HomeFragment extends Fragment {
 
             startActivity(intent);
         });
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        homeViewModel.getDiscoveredMovies().removeObservers(this);
     }
 }

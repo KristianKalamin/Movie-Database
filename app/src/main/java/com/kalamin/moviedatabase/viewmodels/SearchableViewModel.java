@@ -1,13 +1,13 @@
 package com.kalamin.moviedatabase.viewmodels;
 
 import android.app.Application;
-import android.os.Handler;
-import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 
+import com.kalamin.moviedatabase.AbsentLiveData;
 import com.kalamin.moviedatabase.model.entity.Actor;
 import com.kalamin.moviedatabase.model.entity.Movie;
 import com.kalamin.moviedatabase.repository.ActorsRepository;
@@ -19,33 +19,32 @@ import java.util.concurrent.ExecutionException;
 public class SearchableViewModel extends AndroidViewModel {
     private MovieRepository movieRepository;
     private ActorsRepository actorsRepository;
-    private MutableLiveData<List<Movie>> movies = new MutableLiveData<>();
-    private MutableLiveData<List<Actor>> actors = new MutableLiveData<>();
-    private Handler handler;
+    private LiveData<List<Movie>> movies;
+    private LiveData<List<Actor>> actors;
 
     public SearchableViewModel(@NonNull Application application) {
         super(application);
         movieRepository = MovieRepository.getInstance();
         actorsRepository = ActorsRepository.getInstance();
-        handler = new Handler(Looper.getMainLooper());
+
+        movies = AbsentLiveData.create();
+        actors = AbsentLiveData.create();
     }
 
     public void search(String query) {
-        handler.postDelayed(() -> {
-            try {
-                movies.postValue(movieRepository.searchMovies(query));
-                actors.postValue(actorsRepository.searchActors(query));
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }, 50);
+        try {
+            movies = Transformations.map(movieRepository.searchMovies(query), fun -> fun);
+            actors = Transformations.map(actorsRepository.searchActors(query), fun -> fun);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    public MutableLiveData<List<Movie>> getMovies() {
+    public LiveData<List<Movie>> getMovies() {
         return movies;
     }
 
-    public MutableLiveData<List<Actor>> getActors() {
+    public LiveData<List<Actor>> getActors() {
         return actors;
     }
 }

@@ -61,7 +61,7 @@ public class FirebaseRepository {
     }
 
     public void removeFavoriteMovie(@NotNull Movie movie) {
-        firebaseDB.removeFavoriteMovie(movie, FirebaseListener.favoriteMoviesLiveData.getValue(), currentUser.getFirebaseUser().getUid());
+        firebaseDB.removeFavoriteMovie(movie, currentUser.getFirebaseUser().getUid());
     }
 
     public void removeFavoriteMovie(String key) {

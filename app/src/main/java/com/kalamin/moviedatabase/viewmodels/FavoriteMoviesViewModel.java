@@ -6,13 +6,13 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
 
 import com.kalamin.moviedatabase.listener.FirebaseListener;
 import com.kalamin.moviedatabase.model.entity.Movie;
 import com.kalamin.moviedatabase.repository.FirebaseRepository;
 
-import java.util.Map;
+import java.util.List;
 
 public class FavoriteMoviesViewModel extends AndroidViewModel {
     private FirebaseRepository firebaseRepository;
@@ -24,7 +24,7 @@ public class FavoriteMoviesViewModel extends AndroidViewModel {
         handler = new Handler(Looper.getMainLooper());
     }
 
-    public MutableLiveData<Map<String, Movie>> getFavoriteMovies() {
+    public LiveData<List<Movie>> getFavoriteMovies() {
         return FirebaseListener.favoriteMoviesLiveData;
     }
 
